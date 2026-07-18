@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-  <meta name="theme-color" content="#cfd2d6">
+  <meta name="theme-color" content="#0b0b0d">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Glass Cinema">
@@ -13,91 +13,182 @@
   <title>Glass Cinema</title>
 </head>
 <body>
-  <div class="ambient" aria-hidden="true"></div>
-  <main class="shell">
-    <aside class="sidebar glass-panel">
-      <div class="brand">
-        <div class="monogram">GC</div>
-        <div><h1>Glass Cinema</h1><p>Private screening room</p></div>
-      </div>
-
-      <div class="search-wrap">
-        <span>⌕</span><input id="titleSearch" placeholder="Search movies or series…" autocomplete="off">
-      </div>
-
-      <section class="quick-play">
-        <div class="segmented" role="tablist" aria-label="Content type">
-          <button class="segment active" data-type="movie">Movie</button>
-          <button class="segment" data-type="tv">Series</button>
+  <main class="app-shell">
+    <aside class="library-panel" aria-label="Glass Cinema library">
+      <header class="brand-row">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M7 7.75A3.75 3.75 0 0 1 10.75 4h2.5A3.75 3.75 0 0 1 17 7.75v8.5A3.75 3.75 0 0 1 13.25 20h-2.5A3.75 3.75 0 0 1 7 16.25z"/><path d="m10.5 9 4.5 3-4.5 3z"/></svg>
         </div>
-        <label class="label" for="idInput">TMDB or IMDb number</label>
-        <div class="input-row">
-          <input id="idInput" placeholder="e.g. 603" autocomplete="off" autocapitalize="off" spellcheck="false">
-          <button class="play" id="playButton" aria-label="Play"><span>▶</span></button>
+        <div class="brand-copy">
+          <h1>Glass Cinema</h1>
+          <p>Private screening room</p>
         </div>
+        <button class="icon-button quiet" id="settingsBtn" type="button" aria-label="Open settings" title="Settings">
+          <svg viewBox="0 0 24 24"><path d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"/><path d="M19.1 13.1a7.8 7.8 0 0 0 .05-2.2l2-1.55-2-3.45-2.48 1a8.6 8.6 0 0 0-1.92-1.1L14.4 3h-4.8l-.35 2.8a8.6 8.6 0 0 0-1.92 1.1l-2.48-1-2 3.45 2 1.55a7.8 7.8 0 0 0 .05 2.2l-2 1.55 2 3.45 2.43-1a8.5 8.5 0 0 0 1.97 1.14L9.6 21h4.8l.35-2.76a8.5 8.5 0 0 0 1.97-1.14l2.43 1 2-3.45z"/></svg>
+        </button>
+      </header>
+
+      <section class="finder" aria-label="Find a title">
+        <label class="search-field" for="titleSearch">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></svg>
+          <input id="titleSearch" type="search" placeholder="Search movies or series" autocomplete="off">
+          <kbd>⌘ K</kbd>
+        </label>
+        <div class="search-results" id="results" aria-live="polite"></div>
+      </section>
+
+      <section class="play-card" aria-labelledby="quickPlayHeading">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">QUICK PLAY</span>
+            <h2 id="quickPlayHeading">Choose a title</h2>
+          </div>
+        </div>
+
+        <div class="segmented-control" role="tablist" aria-label="Content type">
+          <button class="segment active" type="button" data-type="movie" role="tab" aria-selected="true">Movie</button>
+          <button class="segment" type="button" data-type="tv" role="tab" aria-selected="false">Series</button>
+        </div>
+
+        <label class="field-label" for="idInput">TMDB or IMDb identifier</label>
+        <div class="id-row">
+          <input id="idInput" placeholder="e.g. 603 or tt0133093" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="primary-play" id="playButton" type="button" aria-label="Play selected title">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6z"/></svg>
+          </button>
+        </div>
+
         <div class="episode-row" id="episodeRow" hidden>
-          <label>Season<input id="season" type="number" min="1" value="1" inputmode="numeric"></label>
-          <label>Episode<input id="episode" type="number" min="1" value="1" inputmode="numeric"></label>
+          <label><span>Season</span><input id="season" type="number" min="1" value="1" inputmode="numeric"></label>
+          <label><span>Episode</span><input id="episode" type="number" min="1" value="1" inputmode="numeric"></label>
+        </div>
+
+        <div class="selection-card" id="selectionCard" hidden>
+          <div class="selection-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="m9 7 8 5-8 5z"/></svg>
+          </div>
+          <div class="selection-copy">
+            <span>Selected</span>
+            <strong id="selectedTitle"></strong>
+            <small id="selectedMeta"></small>
+          </div>
+          <button class="icon-button quiet" id="clearSelection" type="button" aria-label="Clear selection">
+            <svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>
+          </button>
         </div>
       </section>
 
-      <div class="results" id="results" aria-live="polite"></div>
-      <div class="selection-card" id="selectionCard" hidden>
-        <div><small>SELECTED</small><strong id="selectedTitle"></strong><span id="selectedMeta"></span></div>
-        <button id="clearSelection" aria-label="Clear selection">×</button>
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="status" id="catalogueStatus"><i></i><span>Loading catalogue…</span></div>
-        <button class="settings-row" id="settingsBtn"><span>⚙</span><span>Settings</span><b>›</b></button>
-      </div>
+      <footer class="library-footer">
+        <div class="catalogue-status" id="catalogueStatus"><i></i><span>Loading catalogue…</span></div>
+        <span class="version">v10.0</span>
+      </footer>
     </aside>
 
-    <section class="content">
-      <section class="stage glass-panel" id="stage">
+    <section class="cinema-area">
+      <section class="stage" id="stage" aria-label="Video stage">
         <div class="empty-state" id="emptyState">
-          <div class="hero-mark">GC</div>
-          <h2>Your private screening room</h2>
-          <p>Search for a title or enter its identifier.</p>
+          <div class="empty-visual" aria-hidden="true">
+            <div class="horizon"></div>
+            <div class="empty-play"><svg viewBox="0 0 24 24"><path d="m9 6 10 6-10 6z"/></svg></div>
+          </div>
+          <div class="empty-copy">
+            <span class="eyebrow">GLASS CINEMA</span>
+            <h2>Your screen is ready.</h2>
+            <p>Search the catalogue or enter an identifier to begin.</p>
+          </div>
         </div>
 
         <div class="embed-player" id="embedPlayer" hidden>
           <iframe id="playerFrame" title="Video player" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
           <div class="enhancement-screen" id="enhancementScreen" aria-hidden="true"></div>
-          <div class="player-title" id="playerTitleDisplay"><small>NOW PLAYING</small><strong>Glass Cinema</strong></div>
-          <button class="reveal-controls" id="revealControls" aria-label="Show picture controls">•••</button>
-          <div class="player-toolbar glass-dark" id="playerToolbar" aria-label="Picture controls">
-            <button id="closePlayer" class="toolbar-text">Done</button>
-            <div class="modes" role="group" aria-label="Picture mode">
-              <button class="mode active" data-filter="original">Original</button>
-              <button class="mode" data-filter="enhanced">Enhanced</button>
-              <button class="mode" data-filter="clear">Glass Clear</button>
-              <button class="mode" data-filter="cinema">Cinema</button>
+
+          <div class="player-chrome" aria-label="Glass Cinema player controls">
+            <div class="now-playing-pill">
+              <button class="player-icon-button" id="closePlayer" type="button" aria-label="Close player" title="Done">
+                <svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg>
+              </button>
+              <div class="now-playing-copy" id="playerTitleDisplay">
+                <small>NOW PLAYING</small>
+                <strong>Glass Cinema</strong>
+              </div>
             </div>
-            <button id="fullscreenBtn" class="toolbar-text">Full Screen</button>
-            <button id="openDirect" class="toolbar-text">Open Directly</button>
+
+            <button class="more-button" id="revealControls" type="button" aria-label="Show Glass Cinema menu" aria-expanded="false" aria-controls="playerMenu">
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+
+          <button class="player-menu-scrim" id="playerMenuScrim" type="button" aria-label="Close Glass Cinema menu" hidden></button>
+          <div class="player-menu" id="playerMenu" role="dialog" aria-label="Glass Cinema menu" aria-hidden="true" hidden>
+            <div class="menu-header">
+              <div>
+                <span class="eyebrow">GLASS CINEMA</span>
+                <h3>Picture controls</h3>
+              </div>
+              <button class="player-icon-button" id="closePlayerMenu" type="button" aria-label="Close menu">
+                <svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>
+              </button>
+            </div>
+
+            <div class="picture-grid" role="group" aria-label="Picture mode">
+              <button class="picture-mode active" type="button" data-filter="original" aria-pressed="true"><span>Original</span><small>Untouched image</small></button>
+              <button class="picture-mode" type="button" data-filter="enhanced" aria-pressed="false"><span>Enhanced</span><small>Gentle luminance</small></button>
+              <button class="picture-mode" type="button" data-filter="clear" aria-pressed="false"><span>Glass Clear</span><small>Crisper contrast</small></button>
+              <button class="picture-mode" type="button" data-filter="cinema" aria-pressed="false"><span>Cinema</span><small>Softer theatre tone</small></button>
+            </div>
+
+            <div class="menu-divider"></div>
+
+            <button class="menu-action" id="fullscreenBtn" type="button">
+              <span class="menu-action-icon"><svg viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M20 16v4h-4M4 16v4h4"/></svg></span>
+              <span><strong>Full screen</strong><small>Expand Glass Cinema</small></span>
+              <svg class="chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+            <button class="menu-action" id="openDirect" type="button">
+              <span class="menu-action-icon"><svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8"/><path d="M18 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></span>
+              <span><strong>Open directly</strong><small>Use the provider page</small></span>
+              <svg class="chevron" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+
+            <p class="menu-note">The video provider’s own playback menu remains available inside the video.</p>
           </div>
         </div>
       </section>
 
-      <section class="recent glass-panel">
-        <div class="recent-head"><div><small>LIBRARY</small><h3>Continue Watching</h3></div><button id="clearRecent" class="text-button">Clear</button></div>
+      <section class="continue-panel" aria-labelledby="continueHeading">
+        <div class="continue-heading">
+          <div>
+            <span class="eyebrow">LIBRARY</span>
+            <h2 id="continueHeading">Continue watching</h2>
+          </div>
+          <button id="clearRecent" class="text-button" type="button">Clear</button>
+        </div>
         <div class="recent-list" id="recentList"><p>No recent titles yet.</p></div>
       </section>
-
-      <footer><span>Glass Cinema v9.1</span><span class="ready"><i></i> Ready</span></footer>
     </section>
   </main>
 
-  <dialog id="settingsDialog" class="settings glass-panel">
+  <dialog id="settingsDialog" class="settings-dialog">
     <form method="dialog">
-      <div class="dialog-head"><div><small>PLAYBACK</small><h2>Settings</h2></div><button value="cancel" class="round">×</button></div>
-      <label class="field">Provider address<input id="baseUrl" type="url" value="https://vidrock.ru" autocapitalize="off" spellcheck="false"></label>
-      <label class="switch-row"><span><strong>Prefer TMDB identifiers</strong><small>IMDb identifiers are also accepted when entered manually.</small></span><input id="preferTmdb" type="checkbox" checked></label>
-      <p class="note">Search uses the local catalogue mirror. Playback remains contained inside the provider frame.</p>
-      <div class="dialog-actions"><button value="cancel" class="secondary">Cancel</button><button value="default" class="primary" id="saveSettings">Save</button></div>
+      <header class="dialog-header">
+        <div><span class="eyebrow">PLAYBACK</span><h2>Settings</h2></div>
+        <button value="cancel" class="icon-button quiet" aria-label="Close settings">
+          <svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>
+        </button>
+      </header>
+      <label class="dialog-field">Provider address<input id="baseUrl" type="url" value="https://vidrock.ru" autocapitalize="off" spellcheck="false"></label>
+      <label class="switch-row">
+        <span><strong>Prefer TMDB identifiers</strong><small>IMDb identifiers remain available for manual playback.</small></span>
+        <input id="preferTmdb" type="checkbox" checked>
+      </label>
+      <p class="dialog-note">Search uses the local catalogue mirror. Playback stays contained inside the provider frame.</p>
+      <footer class="dialog-actions">
+        <button value="cancel" class="secondary-button">Cancel</button>
+        <button value="default" class="primary-button" id="saveSettings">Save</button>
+      </footer>
     </form>
   </dialog>
+
   <div class="toast" id="toast" role="status" hidden></div>
   <script src="player.js"></script>
 </body>
