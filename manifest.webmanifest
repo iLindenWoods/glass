@@ -1,22 +1,14 @@
 {
-  "name": "Glass Cinema",
-  "short_name": "Glass Cinema",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#070a10",
-  "theme_color": "#080b12",
-  "description": "A private catalogue player with no paid APIs.",
-  "icons": [
-    {
-      "src": "icons/icon192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+  "name":"Glass Cinema — Valora × Elara",
+  "short_name":"Glass Cinema",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "background_color":"#07070d",
+  "theme_color":"#080810",
+  "description":"A glass-style film and series launcher for iPad.",
+  "icons":[
+    {"src":"icons/icon192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icons/icon512.png","sizes":"512x512","type":"image/png"}
   ]
 }

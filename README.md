@@ -1,13 +1,19 @@
-# Glass Cinema for iPad
+# Glass Cinema — Valora × Elara v4.0
 
-This is a static Progressive Web App. It contains no paid APIs, API keys, analytics, or subscriptions.
+GitHub Pages-ready iPad web app. No paid APIs or embedded API keys.
 
-## Install on iPad
-1. Publish this folder on any HTTPS static host.
-2. Open the published address in Safari.
-3. Tap **Share → Add to Home Screen**.
+## Why playback defaults to same-window mode
+Vidrock may block playback when placed inside an iframe on another website. Same-window mode navigates directly to the player route, avoiding that frame restriction. Use Safari's Back button to return.
 
-A ZIP in the Files app cannot be installed as a Home Screen web app because service workers and PWA installation require HTTPS.
+## Updating an existing GitHub repository
+Upload and replace these files at the repository root:
+- index.html
+- styles.css
+- player.js
+- manifest.webmanifest
+- sw.js
+- icons/icon180.png
+- icons/icon192.png
+- icons/icon512.png
 
-## GitHub Pages
-Create an empty GitHub repository, upload the contents of this folder, and enable **Settings → Pages → GitHub Actions**. The included workflow publishes it automatically.
+After committing, wait for GitHub Pages to redeploy. If the old design remains, remove the Home Screen icon, open the GitHub Pages URL in Safari, reload it, then add it to the Home Screen again.

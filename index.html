@@ -1,12 +1,111 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<meta name="theme-color" content="#080b12"><meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Glass Cinema">
-<link rel="apple-touch-icon" href="icons/icon180.png"><link rel="manifest" href="manifest.webmanifest">
-<title>Glass Cinema 3.0</title><link rel="stylesheet" href="styles.css"></head><body>
-<header class="topbar"><div class="brand"><div class="orb">GC</div><div><h1>Glass Cinema</h1><p>iPad player · no paid APIs · v3.0</p></div></div><div class="header-actions"><button id="installBtn" class="secondary">Install on iPad</button><button id="settingsBtn" class="secondary">Settings</button></div></header>
-<main class="layout"><aside class="library glass-panel"><div class="tabs"><button class="tab active" data-type="movie">Movies</button><button class="tab" data-type="tv">Series</button></div><div class="searchrow"><input id="search" inputmode="search" placeholder="Title or TMDB number" autocomplete="off"><button id="loadBtn">Play</button></div><div id="status" class="status">Loading catalogue…</div><div id="results" class="results"></div></aside>
-<section class="stage glass-panel"><div id="empty" class="empty"><div class="playmark">▶</div><strong>Select a title</strong><span>Search the catalogue or enter its numeric identifier.</span></div><div id="playerWrap" class="player-wrap preset-glass" hidden><iframe id="embed" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe><video id="direct" controls playsinline crossorigin="anonymous" hidden></video><div class="glass-overlay" aria-hidden="true"></div></div><div class="toolbar"><span id="nowPlaying" class="now-playing">Nothing playing</span><div class="episode-controls"><label>Season <input id="season" type="number" min="1" value="1"></label><label>Episode <input id="episode" type="number" min="1" value="1"></label></div><select id="preset" aria-label="Image preset"><option value="original">Original</option><option value="glass" selected>Glass Clear</option><option value="cinema">Cinema</option><option value="classic">Classic Restore</option><option value="animation">Animation</option></select><button id="fullscreen" class="secondary">Fullscreen</button></div><div class="notice">Only play material you are authorised to access. Filters improve presentation but do not reconstruct missing source detail.</div></section></main>
-<div id="settings" class="sheet" hidden><div class="sheet-card glass-panel"><form id="settingsForm"><h2>Settings</h2><label>Catalogue base URL<input id="catalogBase" value="https://vidrock.ru/list" autocapitalize="off" spellcheck="false"></label><label>Embed base URL<input id="embedBase" value="https://vidrock.ru" autocapitalize="off" spellcheck="false"></label><label>Direct media URL (optional)<input id="directUrl" placeholder="https://…/video.mp4" autocapitalize="off" spellcheck="false"></label><p>No keys, subscriptions, analytics, advertising SDKs, or paid APIs are included. The external catalogue/player service remains independent of this app.</p><div class="sheet-actions"><button type="button" id="cancelSettings" class="secondary">Cancel</button><button type="submit">Save</button></div></form></div></div>
-<script src="player.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+  <meta name="theme-color" content="#080810">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Glass Cinema">
+  <link rel="apple-touch-icon" href="icons/icon180.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>Glass Cinema</title>
+</head>
+<body>
+  <div class="aurora aurora-one"></div>
+  <div class="aurora aurora-two"></div>
+  <div class="grain"></div>
+
+  <main class="app-shell">
+    <header class="topbar glass">
+      <button class="identity" id="homeBtn" aria-label="Glass Cinema home">
+        <span class="sigil"><span></span></span>
+        <span class="identity-copy"><strong>Glass Cinema</strong><small>Valora × Elara edition</small></span>
+      </button>
+      <div class="top-actions">
+        <button class="icon-button" id="installBtn" title="Install on iPad" aria-label="Install on iPad">＋</button>
+        <button class="icon-button" id="settingsBtn" title="Settings" aria-label="Settings">•••</button>
+      </div>
+    </header>
+
+    <section class="hero glass" id="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-copy">
+        <span class="eyebrow" id="eyebrow">YOUR PRIVATE SCREENING ROOM</span>
+        <h1 id="heroTitle">A quieter way<br>to enter a story.</h1>
+        <p id="heroText">Search by title or TMDB number. Glass Cinema opens the selected stream in the same iPad window, avoiding the blocked double-frame player.</p>
+        <div class="hero-actions">
+          <button class="primary" id="focusSearch">Explore</button>
+          <button class="secondary" id="resumeBtn" hidden>Resume last title</button>
+        </div>
+      </div>
+      <div class="prism" aria-hidden="true"><div class="prism-core"></div><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div></div>
+    </section>
+
+    <section class="command glass" aria-label="Find and play">
+      <div class="type-switch" role="tablist">
+        <button class="type active" data-type="movie" role="tab">Film</button>
+        <button class="type" data-type="tv" role="tab">Series</button>
+      </div>
+      <div class="search-box">
+        <span class="search-icon">⌕</span>
+        <input id="search" inputmode="search" autocomplete="off" placeholder="Title or TMDB number">
+        <button id="clearSearch" class="clear" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="episode-fields" id="episodeFields" hidden>
+        <label><span>Season</span><input id="season" type="number" min="1" value="1"></label>
+        <label><span>Episode</span><input id="episode" type="number" min="1" value="1"></label>
+      </div>
+      <button class="play-button" id="playBtn"><span>Play</span><b>▶</b></button>
+    </section>
+
+    <section class="content-grid">
+      <article class="selection glass">
+        <div class="section-heading"><div><span class="eyebrow">NOW SELECTED</span><h2 id="selectionTitle">Nothing selected</h2></div><span class="status-dot" id="statusDot"></span></div>
+        <p id="selectionMeta">Enter a numeric TMDB identifier, or choose one of the curated titles below.</p>
+        <div class="selected-actions">
+          <button class="secondary" id="copyIdBtn" disabled>Copy ID</button>
+          <button class="secondary" id="directOpenBtn" disabled>Open source</button>
+        </div>
+      </article>
+
+      <article class="mood glass">
+        <span class="eyebrow">GLASS MOOD</span>
+        <div class="mood-row">
+          <button class="mood-chip active" data-mood="luminous">Luminous</button>
+          <button class="mood-chip" data-mood="cinema">Cinema</button>
+          <button class="mood-chip" data-mood="nocturne">Nocturne</button>
+        </div>
+        <p>These moods shape the Glass Cinema interface. External protected players control their own picture processing.</p>
+      </article>
+    </section>
+
+    <section class="curated glass">
+      <div class="section-heading"><div><span class="eyebrow">CURATED FOR YOU</span><h2>Stories worth entering</h2></div><span class="catalogue-status" id="catalogueStatus">Local collection</span></div>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <footer>Glass Cinema does not host media. Only access material you are authorised to view.</footer>
+  </main>
+
+  <div class="sheet" id="settings" hidden>
+    <div class="sheet-card glass">
+      <div class="sheet-head"><div><span class="eyebrow">PREFERENCES</span><h2>Glass Cinema</h2></div><button class="icon-button" id="closeSettings">×</button></div>
+      <form id="settingsForm">
+        <label class="field"><span>Player base address</span><input id="embedBase" value="https://vidrock.ru" autocapitalize="off" spellcheck="false"></label>
+        <label class="field"><span>Playback behaviour</span><select id="playbackMode"><option value="same">Same window — recommended on iPad</option><option value="new">New Safari tab</option><option value="embed">Embedded frame — may be blocked</option></select></label>
+        <p class="settings-note">Same-window mode avoids the cross-origin frame restriction that caused “Content unavailable”. Use Safari’s Back button to return to Glass Cinema.</p>
+        <div class="sheet-actions"><button type="button" class="secondary" id="cancelSettings">Cancel</button><button type="submit" class="primary">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="embed-layer" id="embedLayer" hidden>
+    <div class="embed-bar glass"><button id="closeEmbed">‹ Back</button><strong id="embedTitle">Playing</strong><button id="externalEmbed">Open directly</button></div>
+    <iframe id="embed" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="no-referrer"></iframe>
+  </div>
+
+  <script src="player.js"></script>
+</body>
+</html>
