@@ -9,10 +9,11 @@ let selected = null;
 let catalogues = { movie: [], tv: [] };
 let currentRoute = '';
 let searchTimer = 0;
+let toolbarTimer = null;
 
 
-function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV75')||'{}')}}catch{return{...defaults}}}
-function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV75',JSON.stringify(state))}
+function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV92')||'{}')}}catch{return{...defaults}}}
+function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV92',JSON.stringify(state))}
 function validHttps(value){try{const u=new URL(value);return u.protocol==='https:'?u:null}catch{return null}}
 function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3000)}
 function setStatus(kind,text){const el=$('#catalogueStatus');el.className='status '+kind;el.querySelector('span').textContent=text}
@@ -70,10 +71,11 @@ $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchT
 $('#idInput').addEventListener('input',()=>{selected=null;renderSelection()});
 $('#idInput').addEventListener('keydown',e=>{if(e.key==='Enter')play()});
 $('#playButton').onclick=play;$('#closePlayer').onclick=()=>{hideToolbar();closePlayer()};$('#fullscreenBtn').onclick=()=>{hideToolbar();fullscreen()};
-$('#revealControls').onclick=toggleToolbar;
+$('#revealControls').addEventListener('pointerup',e=>{e.preventDefault();e.stopPropagation();toggleToolbar();});
 $$('[data-mode-card]').forEach(b=>b.onclick=()=>applyFilter(b.dataset.modeCard));
 $('#openDirect').onclick=()=>{hideToolbar();if(currentRoute)window.location.assign(currentRoute)};
 $('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b){applyFilter(b.dataset.filter);hideToolbar()}};
+$('#playerToolbar').addEventListener('pointerdown',e=>e.stopPropagation());
 $('#clearSelection').onclick=()=>{selected=null;$('#idInput').value='';renderSelection()};
 $('#clearRecent').onclick=()=>{saveState({recent:[]});renderRecent()};
 $('#settingsBtn').onclick=()=>{$('#baseUrl').value=state.baseUrl;$('#preferTmdb').checked=state.preferTmdb;$('#settingsDialog').showModal()};

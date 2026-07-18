@@ -26,3 +26,50 @@
 .secondary,.round{background:#24212a!important;color:#f4eef2!important}
 .status i,.ready i{box-shadow:0 0 10px currentColor}
 input::placeholder{color:#8f848d}
+
+/* v9.2 — Dark Apple balance pass */
+:root{
+  --text:#f7f4f5;
+  --muted:#aaa2a8;
+  --surface:#211d23;
+  --surface-hi:#2b252d;
+  --surface-lo:#141216;
+  --panel:rgba(30,26,32,.88);
+  --panel-strong:rgba(38,32,40,.94);
+  --dark:#141216;
+  --accent:#d98f99;
+  --accent-strong:#c86f72;
+  --green:#68d391;
+  --line:rgba(255,255,255,.075);
+  --shadow:18px 18px 42px rgba(4,3,6,.48),-10px -10px 26px rgba(255,255,255,.025);
+  --inset:inset 4px 4px 10px rgba(5,4,7,.55),inset -2px -2px 7px rgba(255,255,255,.035)
+}
+html,body{background:#141216}
+body,button,input,dialog{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;font-kerning:normal;-webkit-font-smoothing:antialiased}
+.ambient{background:radial-gradient(circle at 18% 8%,rgba(217,143,153,.09),transparent 32%),radial-gradient(circle at 84% 88%,rgba(200,111,114,.06),transparent 36%),linear-gradient(145deg,#1a171c,#111014 58%,#1c181e)}
+.shell{background:rgba(20,18,23,.94);border-color:rgba(255,255,255,.065)}
+.glass-panel{background:linear-gradient(145deg,rgba(43,37,45,.93),rgba(25,22,28,.89));border-color:rgba(255,255,255,.065);backdrop-filter:blur(30px) saturate(82%);-webkit-backdrop-filter:blur(30px) saturate(82%)}
+.sidebar{background:linear-gradient(180deg,rgba(37,32,39,.96),rgba(24,21,27,.95))}
+.monogram{background:linear-gradient(145deg,#3a3038,#1d191f);color:#fff;box-shadow:10px 10px 24px rgba(4,3,6,.54),-7px -7px 18px rgba(255,255,255,.025)}
+.brand h1{font-weight:700;letter-spacing:-.03em}.brand p{font-weight:400}
+.search-wrap,.segmented,.input-row input,.episode-row input,.field input{background:#1c191f;color:var(--text)}
+.segment{color:#9d969c}.segment.active{background:linear-gradient(145deg,#3a323a,#29232b)!important;color:#fff!important;box-shadow:6px 6px 14px rgba(4,3,6,.38),-4px -4px 10px rgba(255,255,255,.025)!important}
+.play{background:linear-gradient(145deg,#d98f99,#be686b)!important;color:#fff!important;box-shadow:0 10px 25px rgba(190,104,107,.25),inset 0 1px rgba(255,255,255,.18)!important}
+.selection-card,.recent-chip,.round,.secondary{background:linear-gradient(145deg,#2c262e,#1b181e)!important;color:var(--text)!important}
+.stage{background:#09090b;border-radius:28px}
+.player-title{color:#fff;text-shadow:0 2px 16px rgba(0,0,0,.85)}
+.player-title strong{font-weight:650;letter-spacing:-.015em}
+.reveal-controls{left:18px;top:18px;bottom:auto;z-index:30;width:50px;height:42px;border-radius:21px;background:rgba(30,26,32,.88)!important;color:#fff!important;border:1px solid rgba(255,255,255,.11)!important;box-shadow:0 12px 32px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);touch-action:manipulation;cursor:pointer;font-size:18px;line-height:1}
+.reveal-controls:active{transform:scale(.96)}
+.player-toolbar{z-index:29;bottom:18px;gap:3px;padding:7px 8px;border-radius:20px;max-width:calc(100% - 36px);overflow-x:auto;scrollbar-width:none}
+.player-toolbar::-webkit-scrollbar{display:none}
+.glass-dark{background:rgba(27,24,30,.91)!important;border-color:rgba(255,255,255,.09)!important;box-shadow:0 16px 40px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.08)!important}
+.player-toolbar button{color:#f5f2f4!important;font-weight:500;letter-spacing:-.01em;padding:10px 13px}
+.player-toolbar button:hover,.player-toolbar button:focus,.mode.active{background:rgba(217,143,153,.15)!important;color:#fff!important}
+.recent{background:linear-gradient(145deg,rgba(40,34,42,.90),rgba(24,21,27,.90))}
+.recent-head h3{font-weight:650;letter-spacing:-.025em}.text-button{color:#d98f99}
+.settings{background:linear-gradient(145deg,#2d2730,#1c181f);border-color:rgba(255,255,255,.08)}
+.primary{background:linear-gradient(145deg,#d98f99,#be686b)!important;color:#fff!important}
+.toast{background:rgba(31,27,33,.94);color:#fff;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px)}
+footer{opacity:.8}
+@media(max-width:900px){.player-toolbar{left:18px;right:18px;transform:translateY(16px);max-width:none}.player-toolbar.visible{transform:translateY(0)}.player-title{display:block;top:16px;max-width:60%}}

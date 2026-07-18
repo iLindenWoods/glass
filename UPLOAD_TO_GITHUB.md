@@ -1,9 +1,3 @@
-# Upload v9.1 to GitHub Pages
+Upload every file and folder in this package to the root of the GitHub Pages repository, replacing the previous version. Keep `.github` and `catalogues`.
 
-Replace the existing repository contents with all files and folders from this package, including `.github`, `catalogues`, and `icons`.
-
-After deployment, open:
-
-`https://ilindenwoods.github.io/glass-cinema/?v=8.0`
-
-Confirm the footer reads `Glass Cinema v9.1`.
+After deployment, open the site once with `?v=9.2`.
