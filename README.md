@@ -1,4 +1,4 @@
-# Glass Cinema v10.0
+# Glass Cinema v10.1
 
 A complete flat 2D redesign based on the minimalist cinema-player concept.
 
@@ -13,3 +13,7 @@ A complete flat 2D redesign based on the minimalist cinema-player concept.
 - Improved search, selection, settings, recent-title playback, mobile/iPad responsiveness, and keyboard accessibility.
 
 The three-dot button opens the Glass Cinema menu. Interaction resets the three-second inactivity timer; choosing a picture mode closes the menu immediately.
+
+
+## v10.1 iPad correction
+The cinema remains visible first in Safari, Home Screen mode, Split View and Stage Manager. Asset URLs and the service-worker cache are versioned to prevent stale layouts.

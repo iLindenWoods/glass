@@ -1,9 +1,9 @@
-const CACHE = 'glass-cinema-v10-0';
+const CACHE = 'glass-cinema-v10-1';
 const CORE = [
   './',
   'index.html',
-  'styles.css',
-  'player.js',
+  'styles.css?v=10.1',
+  'player.js?v=10.1',
   'manifest.webmanifest',
   'icons/icon180.png',
   'icons/icon192.png',
@@ -23,19 +23,23 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  if (url.origin !== location.origin) return;
+  if (url.origin !== self.location.origin) return;
 
   if (url.pathname.includes('/catalogues/')) {
     event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request)));
     return;
   }
 
+  // Network first prevents an old iPad Home Screen cache from preserving a broken layout.
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE).then(cache => cache.put(event.request, copy));
-      return response;
-    }))
+    fetch(event.request, { cache: 'no-store' })
+      .then(response => {
+        const copy = response.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, copy));
+        return response;
+      })
+      .catch(() => caches.match(event.request).then(cached => cached || caches.match('index.html')))
   );
 });

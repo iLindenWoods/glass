@@ -3,8 +3,8 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
 const DB_NAME = 'glassCinemaCatalogueV7';
 const STORE = 'catalogues';
-const STATE_KEY = 'glassCinemaV100';
-const LEGACY_STATE_KEYS = ['glassCinemaV92'];
+const STATE_KEY = 'glassCinemaV101';
+const LEGACY_STATE_KEYS = ['glassCinemaV100', 'glassCinemaV92'];
 const MENU_TIMEOUT = 3000;
 const defaults = {
   baseUrl: 'https://vidrock.ru',
@@ -399,7 +399,7 @@ function hidePlayerMenu(returnFocus = true) {
   $('#playerMenuScrim').hidden = true;
   $('#revealControls').setAttribute('aria-expanded', 'false');
   $('#revealControls').setAttribute('aria-label', 'Show Glass Cinema menu');
-  if (returnFocus && !$('#embedPlayer').hidden) $('#revealControls').focus({ preventScroll: true });
+  if (returnFocus && !$('#embedPlayer').hidden) { try { $('#revealControls').focus({ preventScroll: true }); } catch { $('#revealControls').focus(); } }
 }
 
 function togglePlayerMenu() {
@@ -566,7 +566,7 @@ $('#playerFrame').addEventListener('load', () => {
   renderRecent();
   applyFilter(state.pictureMode || 'original', false);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=10.1', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
   }
   await loadCatalogues();
 })();
