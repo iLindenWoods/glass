@@ -9,7 +9,7 @@ let selected = null;
 let catalogues = { movie: [], tv: [] };
 let currentRoute = '';
 let searchTimer = 0;
-let toolbarHideTimer = 0;
+
 
 function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV75')||'{}')}}catch{return{...defaults}}}
 function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV75',JSON.stringify(state))}
@@ -40,18 +40,22 @@ function routeFor(id){const clean=normalizeId(id);const base=validHttps(state.ba
 function addRecent(item){const recent=[{...item,season:mediaType==='tv'?Math.max(1,+$('#season').value||1):null,episode:mediaType==='tv'?Math.max(1,+$('#episode').value||1):null,playedAt:Date.now()},...state.recent.filter(x=>!(x.id===item.id&&x.type===item.type))].slice(0,12);saveState({recent});renderRecent()}
 function renderRecent(){const root=$('#recentList');root.replaceChildren();if(!state.recent.length){root.innerHTML='<p>No recent titles yet.</p>';return}for(const item of state.recent){const b=document.createElement('button');b.className='recent-chip';b.textContent=item.title||`${item.type==='tv'?'Series':'Movie'} ${item.id}`;b.onclick=()=>{setType(item.type);selected=item;$('#idInput').value=item.id;if(item.season)$('#season').value=item.season;if(item.episode)$('#episode').value=item.episode;renderSelection()};root.append(b)}}
 function play(){const id=normalizeId($('#idInput').value);if(!id){toast('Enter a valid TMDB number or IMDb tt-number.');$('#idInput').focus();return}const route=routeFor(id);if(!route){toast('Check the provider address in Settings.');return}currentRoute=route;const item=selected||{id,type:mediaType,title:`${mediaType==='tv'?'Series':'Movie'} ${id}`};addRecent(item);const titleNode=$('#playerTitleDisplay strong');if(titleNode)titleNode.textContent=item.title||`${mediaType==='tv'?'Series':'Movie'} ${id}`;$('#emptyState').hidden=true;$('#embedPlayer').hidden=false;const frame=$('#playerFrame');frame.src='about:blank';requestAnimationFrame(()=>frame.src=route);showToolbar();toast('Loading inside Glass Cinema…')}
-function closePlayer(){const frame=$('#playerFrame');frame.src='about:blank';$('#embedPlayer').hidden=true;$('#emptyState').hidden=false;currentRoute='';clearTimeout(toolbarHideTimer)}
-function showToolbar(persist=false){
+function closePlayer(){const frame=$('#playerFrame');frame.src='about:blank';$('#embedPlayer').hidden=true;$('#emptyState').hidden=false;currentRoute='';}
+function showToolbar(){
   const toolbar=$('#playerToolbar');
   const player=$('#embedPlayer');
   if(player.hidden)return;
   toolbar.classList.add('visible');
-  clearTimeout(toolbarHideTimer);
-  if(!persist)toolbarHideTimer=setTimeout(()=>{
-    if(!toolbar.matches(':focus-within')) toolbar.classList.remove('visible');
-  },3200);
+  $('#revealControls').setAttribute('aria-label','Hide Glass Cinema controls');
 }
-function hideToolbar(){clearTimeout(toolbarHideTimer);$('#playerToolbar').classList.remove('visible')}
+function hideToolbar(){
+  $('#playerToolbar').classList.remove('visible');
+  $('#revealControls').setAttribute('aria-label','Show Glass Cinema controls');
+}
+function toggleToolbar(){
+  const toolbar=$('#playerToolbar');
+  toolbar.classList.contains('visible')?hideToolbar():showToolbar();
+}
 async function fullscreen(){const target=$('#embedPlayer');try{if(target.requestFullscreen)await target.requestFullscreen();else if(target.webkitRequestFullscreen)target.webkitRequestFullscreen();else toast('Tap the player’s own full-screen button.')}catch{toast('Tap the player’s own full-screen button.')}}
 function applyFilter(mode){const frame=$('#playerFrame'),overlay=$('#enhancementScreen'),player=$('#embedPlayer');frame.classList.remove('filter-enhanced','filter-clear','filter-cinema');overlay.classList.remove('active','cinema');player.dataset.pictureMode=mode;if(mode==='enhanced'){frame.classList.add('filter-enhanced');overlay.classList.add('active')}if(mode==='clear')frame.classList.add('filter-clear');if(mode==='cinema'){frame.classList.add('filter-cinema');overlay.classList.add('active','cinema')}$$('.mode').forEach(b=>b.classList.toggle('active',b.dataset.filter===mode));$$('[data-mode-card]').forEach(b=>b.classList.toggle('active',b.dataset.modeCard===mode));toast(mode==='enhanced'?'Luminance enhancement applied — colours unchanged':'Picture mode: '+mode)}
 
@@ -60,7 +64,7 @@ $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchT
 $('#idInput').addEventListener('input',()=>{selected=null;renderSelection()});
 $('#idInput').addEventListener('keydown',e=>{if(e.key==='Enter')play()});
 $('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#fullscreenBtn').onclick=fullscreen;
-$('#revealControls').onclick=()=>showToolbar(true);
+$('#revealControls').onclick=toggleToolbar;
 $$('[data-mode-card]').forEach(b=>b.onclick=()=>applyFilter(b.dataset.modeCard));
 $$('[data-nav-type]').forEach(b=>b.onclick=()=>{setType(b.dataset.navType);$('#titleSearch').focus()});$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
 $('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b)applyFilter(b.dataset.filter)};
@@ -68,12 +72,6 @@ $('#clearSelection').onclick=()=>{selected=null;$('#idInput').value='';renderSel
 $('#clearRecent').onclick=()=>{saveState({recent:[]});renderRecent()};
 $('#settingsBtn').onclick=()=>{$('#baseUrl').value=state.baseUrl;$('#preferTmdb').checked=state.preferTmdb;$('#settingsDialog').showModal()};
 $('#saveSettings').onclick=e=>{const u=validHttps($('#baseUrl').value.trim());if(!u){e.preventDefault();toast('Enter a valid HTTPS provider address.');return}saveState({baseUrl:u.href.replace(/\/$/,''),preferTmdb:$('#preferTmdb').checked});loadCatalogues();toast('Settings saved')};
-const embedPlayer=$('#embedPlayer');
-['pointermove','pointerdown','touchstart'].forEach(eventName=>embedPlayer.addEventListener(eventName,()=>showToolbar(),{passive:true}));
-$('#playerToolbar').addEventListener('pointerenter',()=>showToolbar(true));
-$('#playerToolbar').addEventListener('pointerleave',()=>showToolbar());
-$('#playerToolbar').addEventListener('focusin',()=>showToolbar(true));
-$('#playerToolbar').addEventListener('focusout',()=>showToolbar());
 document.addEventListener('keydown',e=>{
   if($('#embedPlayer').hidden||mediaType!=='tv')return;
 });
