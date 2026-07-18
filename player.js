@@ -11,8 +11,8 @@ let currentRoute = '';
 let searchTimer = 0;
 let toolbarHideTimer = 0;
 
-function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV73')||'{}')}}catch{return{...defaults}}}
-function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV73',JSON.stringify(state))}
+function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV74')||'{}')}}catch{return{...defaults}}}
+function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV74',JSON.stringify(state))}
 function validHttps(value){try{const u=new URL(value);return u.protocol==='https:'?u:null}catch{return null}}
 function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3000)}
 function setStatus(kind,text){const el=$('#catalogueStatus');el.className='status '+kind;el.querySelector('span').textContent=text}
@@ -39,7 +39,7 @@ function renderResults(query=''){const root=$('#results');root.replaceChildren()
 function routeFor(id){const clean=normalizeId(id);const base=validHttps(state.baseUrl);if(!clean||!base)return null;const root=base.href.replace(/\/$/,'');if(mediaType==='movie')return `${root}/movie/${encodeURIComponent(clean)}`;const s=Math.max(1,parseInt($('#season').value)||1),e=Math.max(1,parseInt($('#episode').value)||1);return `${root}/tv/${encodeURIComponent(clean)}/${s}/${e}`}
 function addRecent(item){const recent=[{...item,season:mediaType==='tv'?Math.max(1,+$('#season').value||1):null,episode:mediaType==='tv'?Math.max(1,+$('#episode').value||1):null,playedAt:Date.now()},...state.recent.filter(x=>!(x.id===item.id&&x.type===item.type))].slice(0,12);saveState({recent});renderRecent()}
 function renderRecent(){const root=$('#recentList');root.replaceChildren();if(!state.recent.length){root.innerHTML='<p>No recent titles yet.</p>';return}for(const item of state.recent){const b=document.createElement('button');b.className='recent-chip';b.textContent=item.title||`${item.type==='tv'?'Series':'Movie'} ${item.id}`;b.onclick=()=>{setType(item.type);selected=item;$('#idInput').value=item.id;if(item.season)$('#season').value=item.season;if(item.episode)$('#episode').value=item.episode;renderSelection()};root.append(b)}}
-function play(){const id=normalizeId($('#idInput').value);if(!id){toast('Enter a valid TMDB number or IMDb tt-number.');$('#idInput').focus();return}const route=routeFor(id);if(!route){toast('Check the provider address in Settings.');return}currentRoute=route;const item=selected||{id,type:mediaType,title:`${mediaType==='tv'?'Series':'Movie'} ${id}`};addRecent(item);$('#emptyState').hidden=true;$('#embedPlayer').hidden=false;$('#episodeNavigation').hidden=mediaType!=='tv';const frame=$('#playerFrame');frame.src='about:blank';requestAnimationFrame(()=>frame.src=route);showToolbar();toast('Loading inside Glass Cinema…')}
+function play(){const id=normalizeId($('#idInput').value);if(!id){toast('Enter a valid TMDB number or IMDb tt-number.');$('#idInput').focus();return}const route=routeFor(id);if(!route){toast('Check the provider address in Settings.');return}currentRoute=route;const item=selected||{id,type:mediaType,title:`${mediaType==='tv'?'Series':'Movie'} ${id}`};addRecent(item);$('#emptyState').hidden=true;$('#embedPlayer').hidden=false;const frame=$('#playerFrame');frame.src='about:blank';requestAnimationFrame(()=>frame.src=route);showToolbar();toast('Loading inside Glass Cinema…')}
 function closePlayer(){const frame=$('#playerFrame');frame.src='about:blank';$('#embedPlayer').hidden=true;$('#emptyState').hidden=false;currentRoute='';clearTimeout(toolbarHideTimer)}
 function showToolbar(persist=false){
   const toolbar=$('#playerToolbar');
@@ -55,24 +55,29 @@ function showToolbar(persist=false){
     }
   },2600);
 }
-function switchEpisode(delta){
-  if(mediaType!=='tv')return;
-  const input=$('#episode');
-  const current=Math.max(1,parseInt(input.value)||1);
-  const next=Math.max(1,current+delta);
-  if(next===current&&delta<0){toast('This is already episode 1.');showToolbar();return;}
-  input.value=next;
-  play();
-  toast(`${delta>0?'Next':'Previous'} episode: S${Math.max(1,parseInt($('#season').value)||1)} E${next}`);
+async function fullscreen(){
+  // Full-screen the provider frame itself, not the Glass Cinema wrapper.
+  // This gives Safari/iPadOS the provider's cleaner native-style player and
+  // keeps the Glass Cinema picture toolbar out of the full-screen surface.
+  const frame=$('#playerFrame');
+  try{
+    if(frame.requestFullscreen) await frame.requestFullscreen();
+    else if(frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
+    else toast('Use the player’s own full-screen button.');
+  }catch{
+    toast('Use the player’s own full-screen button.');
+  }
 }
-async function fullscreen(){const target=$('#embedPlayer');try{if(target.requestFullscreen)await target.requestFullscreen();else if(target.webkitRequestFullscreen)target.webkitRequestFullscreen();else toast('Tap the player’s own full-screen button.')}catch{toast('Tap the player’s own full-screen button.')}}
 function applyFilter(mode){const frame=$('#playerFrame'),overlay=$('#enhancementScreen'),player=$('#embedPlayer');frame.classList.remove('filter-enhanced','filter-clear','filter-cinema');overlay.classList.remove('active','cinema');player.dataset.pictureMode=mode;if(mode==='enhanced'){frame.classList.add('filter-enhanced');overlay.classList.add('active')}if(mode==='clear')frame.classList.add('filter-clear');if(mode==='cinema'){frame.classList.add('filter-cinema');overlay.classList.add('active','cinema')}$$('.mode').forEach(b=>b.classList.toggle('active',b.dataset.filter===mode));toast(mode==='enhanced'?'Luminance enhancement applied — colours unchanged':'Picture mode: '+mode)}
 
 $$('.segment').forEach(b=>b.onclick=()=>setType(b.dataset.type));
 $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>renderResults(e.target.value),80)});
 $('#idInput').addEventListener('input',()=>{selected=null;renderSelection()});
 $('#idInput').addEventListener('keydown',e=>{if(e.key==='Enter')play()});
-$('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#previousEpisode').onclick=()=>switchEpisode(-1);$('#nextEpisode').onclick=()=>switchEpisode(1);$('#fullscreenBtn').onclick=fullscreen;$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
+$('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#fullscreenBtn').onclick=fullscreen;
+$('#toolbarReveal').onclick=(event)=>{event.stopPropagation();showToolbar(true)};
+$('#playerToolbar').addEventListener('pointerleave',()=>showToolbar());
+$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
 $('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b)applyFilter(b.dataset.filter)};
 $('#clearSelection').onclick=()=>{selected=null;$('#idInput').value='';renderSelection()};
 $('#clearRecent').onclick=()=>{saveState({recent:[]});renderRecent()};
@@ -86,8 +91,6 @@ $('#playerToolbar').addEventListener('focusin',()=>showToolbar(true));
 $('#playerToolbar').addEventListener('focusout',()=>showToolbar());
 document.addEventListener('keydown',e=>{
   if($('#embedPlayer').hidden||mediaType!=='tv')return;
-  if(e.key==='ArrowRight'&&e.altKey){e.preventDefault();switchEpisode(1)}
-  if(e.key==='ArrowLeft'&&e.altKey){e.preventDefault();switchEpisode(-1)}
 });
 $('#playerFrame').addEventListener('load',()=>{if($('#playerFrame').src!=='about:blank')toast('Player loaded. Enhanced Screen can now be applied.')});
 

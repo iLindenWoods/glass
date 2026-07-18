@@ -64,12 +64,9 @@
         <div class="embed-player" id="embedPlayer" hidden>
           <iframe id="playerFrame" title="Video player" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
           <div class="enhancement-screen" id="enhancementScreen" aria-hidden="true"></div>
+          <button class="toolbar-reveal glass-dark" id="toolbarReveal" aria-label="Show picture controls" title="Show picture controls">•••</button>
           <div class="player-toolbar glass-dark" id="playerToolbar" aria-label="Player controls">
             <button id="closePlayer">Done</button>
-            <div class="episode-navigation" id="episodeNavigation" hidden role="group" aria-label="Episode navigation">
-              <button id="previousEpisode" aria-label="Previous episode" title="Previous episode">◀︎ Episode</button>
-              <button id="nextEpisode" aria-label="Next episode" title="Next episode">Episode ▶︎</button>
-            </div>
             <div class="modes" role="group" aria-label="Picture mode">
               <button class="mode active" data-filter="original">Original</button>
               <button class="mode" data-filter="enhanced">Enhanced Screen</button>
@@ -88,7 +85,7 @@
       <div class="recent-list" id="recentList"><p>No recent titles yet.</p></div>
     </section>
 
-    <footer><span>v7.3</span><span class="ready"><i></i> Ready</span></footer>
+    <footer><span>v7.4</span><span class="ready"><i></i> Ready</span></footer>
   </main>
 
   <dialog id="settingsDialog" class="settings glass">
