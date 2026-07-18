@@ -1,11 +1,7 @@
-# Glass Cinema v9.0
+# Glass Cinema v9.1 — Warm Neumorphic
 
-A redesigned Apple-style iPad web app that preserves the proven embedded playback architecture from v7.5.
+Warm charcoal, blush and muted coral interface based on the supplied reference. No cyan or blue UI accents.
 
-## Highlights
-- New sidebar-based Apple TV-inspired interface.
-- Search, identifiers, series season/episode inputs, picture modes and recent titles.
-- Persistent subtle `•••` control-reveal button over the player, so the Glass Cinema bar can always be restored on iPad even when the embedded iframe captures taps.
-- Auto-hiding Glass Cinema toolbar.
-- Colour-neutral Enhanced mode.
-- Same-origin catalogue mirror workflow retained.
+The three-dot control opens the picture-mode bar for three seconds. Selecting a mode closes it immediately; tapping the dots again also closes it.
+
+Playback, catalogue sync, title search, season/episode fields and colour-neutral Enhanced mode are retained.
