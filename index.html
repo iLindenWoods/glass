@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-  <meta name="theme-color" content="#11151c">
+  <meta name="theme-color" content="#776f69">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Glass Cinema">
@@ -13,7 +13,7 @@
   <title>Glass Cinema</title>
 </head>
 <body>
-  <div class="wallpaper" aria-hidden="true"><i class="glow one"></i><i class="glow two"></i><i class="glow three"></i></div>
+  <div class="wallpaper" aria-hidden="true"><i class="sun"></i><i class="mountains back"></i><i class="mountains front"></i><i class="lake"></i></div>
 
   <main class="app glass">
     <header class="header">
@@ -63,10 +63,12 @@
 
         <div class="embed-player" id="embedPlayer" hidden>
           <iframe id="playerFrame" title="Video player" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          <div class="enhancement-screen" id="enhancementScreen" aria-hidden="true"></div>
           <div class="player-toolbar glass-dark" id="playerToolbar">
             <button id="closePlayer">Done</button>
             <div class="modes" role="group" aria-label="Picture mode">
               <button class="mode active" data-filter="original">Original</button>
+              <button class="mode" data-filter="enhanced">Enhanced Screen</button>
               <button class="mode" data-filter="clear">Glass Clear</button>
               <button class="mode" data-filter="cinema">Cinema</button>
             </div>
@@ -82,7 +84,7 @@
       <div class="recent-list" id="recentList"><p>No recent titles yet.</p></div>
     </section>
 
-    <footer><span>v6.0</span><span class="ready"><i></i> Ready</span></footer>
+    <footer><span>v7.0</span><span class="ready"><i></i> Ready</span></footer>
   </main>
 
   <dialog id="settingsDialog" class="settings glass">
@@ -90,7 +92,7 @@
       <div class="dialog-head"><div><small>PLAYBACK</small><h2>Settings</h2></div><button value="cancel" class="round">×</button></div>
       <label class="field">Provider address<input id="baseUrl" type="url" value="https://vidrock.ru" autocapitalize="off" spellcheck="false"></label>
       <label class="switch-row"><span><strong>Prefer TMDB identifiers</strong><small>IMDb identifiers are also accepted when entered manually.</small></span><input id="preferTmdb" type="checkbox" checked></label>
-      <p class="note">The app uses the provider’s documented embed routes and catalogue files. Availability still depends on the provider and title.</p>
+      <p class="note">Playback uses the provider’s documented embed routes. Search first uses catalogue files mirrored into this GitHub repository by the included free GitHub Action, avoiding browser CORS restrictions.</p>
       <div class="dialog-actions"><button value="cancel" class="secondary">Cancel</button><button value="default" class="primary" id="saveSettings">Save</button></div>
     </form>
   </dialog>

@@ -1,16 +1,20 @@
-# Glass Cinema — Apple Glass v5.0
+# Glass Cinema — Apple Glass Enhanced v7.0
 
-A GitHub Pages-ready iPad web app with a simple Apple-style interface.
+This version keeps the working in-app Vidrock embed, restores the warmer Apple-glass colour system from v5, and adds an **Enhanced Screen** optical layer over the embedded player.
 
-## Playback modes
+## Catalogue search
 
-- **Original:** opens the configured provider directly in the same Safari window. No iframe is used.
-- **Enhanced direct video:** plays a direct HTTPS MP4, WebM, or M4V file in the native browser player with Original, Glass Clear, and Cinema display filters.
+Vidrock's catalogue JSON can be blocked by browser CORS rules. This package includes a free GitHub Action that mirrors the two catalogue files into your own repository, where the app can read them reliably.
 
-## Important limitation
+After uploading all files, open **GitHub → Actions → Sync Vidrock catalogues → Run workflow** once. The action then refreshes the files automatically every day.
 
-A web app cannot guarantee that a third-party provider will always have a title, remain online, or accept a particular route. It also cannot apply visual filters after Safari navigates to an external provider. The app therefore never claims to bypass provider restrictions and does not embed external pages.
+No paid API, API key, analytics service, or advertising library is used.
 
-## Privacy and cost
+## Picture modes
 
-No paid APIs, keys, analytics, advertising, or remote JavaScript libraries are included. Settings and recents are stored locally on the device.
+- **Original** — provider image unchanged.
+- **Enhanced Screen** — mild contrast and saturation recovery plus a translucent optical layer.
+- **Glass Clear** — lighter, restrained clarity.
+- **Cinema** — slightly deeper blacks and softer colour.
+
+These modes improve presentation but cannot reconstruct detail absent from the source.

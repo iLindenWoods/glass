@@ -1,14 +1,1 @@
-{
-  "name": "Glass Cinema — Valora × Elara",
-  "short_name": "Glass Cinema",
-  "description": "A private Apple-style launcher and direct media player with no paid APIs.",
-  "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "background_color": "#11141a",
-  "theme_color": "#11141a",
-  "icons": [
-    {"src":"icons/icon192.png","sizes":"192x192","type":"image/png"},
-    {"src":"icons/icon512.png","sizes":"512x512","type":"image/png"}
-  ]
-}
+{"name":"Glass Cinema — Valora × Elara","short_name":"Glass Cinema","start_url":"./","scope":"./","display":"standalone","background_color":"#0a0d13","theme_color":"#11151c","icons":[{"src":"icons/icon192.png","sizes":"192x192","type":"image/png"},{"src":"icons/icon512.png","sizes":"512x512","type":"image/png"}]}
