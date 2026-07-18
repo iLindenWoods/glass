@@ -41,16 +41,22 @@ function addRecent(item){const recent=[{...item,season:mediaType==='tv'?Math.max
 function renderRecent(){const root=$('#recentList');root.replaceChildren();if(!state.recent.length){root.innerHTML='<p>No recent titles yet.</p>';return}for(const item of state.recent){const b=document.createElement('button');b.className='recent-chip';b.textContent=item.title||`${item.type==='tv'?'Series':'Movie'} ${item.id}`;b.onclick=()=>{setType(item.type);selected=item;$('#idInput').value=item.id;if(item.season)$('#season').value=item.season;if(item.episode)$('#episode').value=item.episode;renderSelection()};root.append(b)}}
 function play(){const id=normalizeId($('#idInput').value);if(!id){toast('Enter a valid TMDB number or IMDb tt-number.');$('#idInput').focus();return}const route=routeFor(id);if(!route){toast('Check the provider address in Settings.');return}currentRoute=route;const item=selected||{id,type:mediaType,title:`${mediaType==='tv'?'Series':'Movie'} ${id}`};addRecent(item);const titleNode=$('#playerTitleDisplay strong');if(titleNode)titleNode.textContent=item.title||`${mediaType==='tv'?'Series':'Movie'} ${id}`;$('#emptyState').hidden=true;$('#embedPlayer').hidden=false;const frame=$('#playerFrame');frame.src='about:blank';requestAnimationFrame(()=>frame.src=route);showToolbar();toast('Loading inside Glass Cinema…')}
 function closePlayer(){const frame=$('#playerFrame');frame.src='about:blank';$('#embedPlayer').hidden=true;$('#emptyState').hidden=false;currentRoute='';}
+function clearToolbarTimer(){
+  if(toolbarTimer){clearTimeout(toolbarTimer);toolbarTimer=null;}
+}
 function showToolbar(){
   const toolbar=$('#playerToolbar');
   const player=$('#embedPlayer');
   if(player.hidden)return;
+  clearToolbarTimer();
   toolbar.classList.add('visible');
-  $('#revealControls').setAttribute('aria-label','Hide Glass Cinema controls');
+  $('#revealControls').setAttribute('aria-label','Hide picture controls');
+  toolbarTimer=setTimeout(hideToolbar,3000);
 }
 function hideToolbar(){
+  clearToolbarTimer();
   $('#playerToolbar').classList.remove('visible');
-  $('#revealControls').setAttribute('aria-label','Show Glass Cinema controls');
+  $('#revealControls').setAttribute('aria-label','Show picture controls');
 }
 function toggleToolbar(){
   const toolbar=$('#playerToolbar');
@@ -63,11 +69,11 @@ $$('.segment').forEach(b=>b.onclick=()=>setType(b.dataset.type));
 $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>renderResults(e.target.value),80)});
 $('#idInput').addEventListener('input',()=>{selected=null;renderSelection()});
 $('#idInput').addEventListener('keydown',e=>{if(e.key==='Enter')play()});
-$('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#fullscreenBtn').onclick=fullscreen;
+$('#playButton').onclick=play;$('#closePlayer').onclick=()=>{hideToolbar();closePlayer()};$('#fullscreenBtn').onclick=()=>{hideToolbar();fullscreen()};
 $('#revealControls').onclick=toggleToolbar;
 $$('[data-mode-card]').forEach(b=>b.onclick=()=>applyFilter(b.dataset.modeCard));
-$$('[data-nav-type]').forEach(b=>b.onclick=()=>{setType(b.dataset.navType);$('#titleSearch').focus()});$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
-$('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b)applyFilter(b.dataset.filter)};
+$('#openDirect').onclick=()=>{hideToolbar();if(currentRoute)window.location.assign(currentRoute)};
+$('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b){applyFilter(b.dataset.filter);hideToolbar()}};
 $('#clearSelection').onclick=()=>{selected=null;$('#idInput').value='';renderSelection()};
 $('#clearRecent').onclick=()=>{saveState({recent:[]});renderRecent()};
 $('#settingsBtn').onclick=()=>{$('#baseUrl').value=state.baseUrl;$('#preferTmdb').checked=state.preferTmdb;$('#settingsDialog').showModal()};

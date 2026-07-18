@@ -1,4 +1,4 @@
-# Glass Cinema v8.1
+# Glass Cinema v9.0
 
 A redesigned Apple-style iPad web app that preserves the proven embedded playback architecture from v7.5.
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-  <meta name="theme-color" content="#d9dde3">
+  <meta name="theme-color" content="#cfd2d6">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Glass Cinema">
@@ -21,17 +21,9 @@
         <div><h1>Glass Cinema</h1><p>Private screening room</p></div>
       </div>
 
-      <div class="global-search search-wrap">
+      <div class="search-wrap">
         <span>⌕</span><input id="titleSearch" placeholder="Search movies or series…" autocomplete="off">
       </div>
-
-      <nav class="nav" aria-label="Library">
-        <button class="nav-item active" type="button"><span>⌂</span>Home</button>
-        <button class="nav-item" type="button" data-nav-type="movie"><span>▤</span>Movies</button>
-        <button class="nav-item" type="button" data-nav-type="tv"><span>▣</span>Series</button>
-        <button class="nav-item" type="button"><span>＋</span>My List</button>
-        <button class="nav-item" type="button"><span>◷</span>Recently Played</button>
-      </nav>
 
       <section class="quick-play">
         <div class="segmented" role="tablist" aria-label="Content type">
@@ -41,7 +33,7 @@
         <label class="label" for="idInput">TMDB or IMDb number</label>
         <div class="input-row">
           <input id="idInput" placeholder="e.g. 603" autocomplete="off" autocapitalize="off" spellcheck="false">
-          <button class="play" id="playButton"><span>▶</span></button>
+          <button class="play" id="playButton" aria-label="Play"><span>▶</span></button>
         </div>
         <div class="episode-row" id="episodeRow" hidden>
           <label>Season<input id="season" type="number" min="1" value="1" inputmode="numeric"></label>
@@ -73,8 +65,8 @@
           <iframe id="playerFrame" title="Video player" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
           <div class="enhancement-screen" id="enhancementScreen" aria-hidden="true"></div>
           <div class="player-title" id="playerTitleDisplay"><small>NOW PLAYING</small><strong>Glass Cinema</strong></div>
-          <button class="reveal-controls" id="revealControls" aria-label="Show Glass Cinema controls">•••</button>
-          <div class="player-toolbar glass-dark visible" id="playerToolbar" aria-label="Player controls">
+          <button class="reveal-controls" id="revealControls" aria-label="Show picture controls">•••</button>
+          <div class="player-toolbar glass-dark" id="playerToolbar" aria-label="Picture controls">
             <button id="closePlayer" class="toolbar-text">Done</button>
             <div class="modes" role="group" aria-label="Picture mode">
               <button class="mode active" data-filter="original">Original</button>
@@ -88,25 +80,12 @@
         </div>
       </section>
 
-      <section class="picture-strip glass-panel">
-        <div class="strip-heading">
-          <div><small>PICTURE</small><h3>Viewing mode</h3></div>
-          <p>Enhanced improves luminance and detail while preserving the original colours.</p>
-        </div>
-        <div class="mode-cards">
-          <button data-mode-card="original" class="mode-card active"><span>◯</span><strong>Original</strong><small>Untouched image</small></button>
-          <button data-mode-card="enhanced" class="mode-card"><span>✣</span><strong>Enhanced</strong><small>Neutral clarity</small></button>
-          <button data-mode-card="clear" class="mode-card"><span>◇</span><strong>Glass Clear</strong><small>Bright and crisp</small></button>
-          <button data-mode-card="cinema" class="mode-card"><span>◐</span><strong>Cinema</strong><small>Soft theatre tone</small></button>
-        </div>
-      </section>
-
       <section class="recent glass-panel">
         <div class="recent-head"><div><small>LIBRARY</small><h3>Continue Watching</h3></div><button id="clearRecent" class="text-button">Clear</button></div>
         <div class="recent-list" id="recentList"><p>No recent titles yet.</p></div>
       </section>
 
-      <footer><span>Glass Cinema v8.1</span><span class="ready"><i></i> Ready</span></footer>
+      <footer><span>Glass Cinema v9.0</span><span class="ready"><i></i> Ready</span></footer>
     </section>
   </main>
 
