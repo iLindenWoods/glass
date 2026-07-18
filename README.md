@@ -1,20 +1,10 @@
-# Glass Cinema — Apple Glass Enhanced v7.0
+# Glass Cinema v7.1
 
-This version keeps the working in-app Vidrock embed, restores the warmer Apple-glass colour system from v5, and adds an **Enhanced Screen** optical layer over the embedded player.
+Warm Apple Cinema palette with natural image enhancement.
 
-## Catalogue search
+- Keeps the working embedded playback from v7.0.
+- Keeps the local catalogue-sync workflow.
+- Replaces the brighter blue-grey palette with charcoal, bronze, warm glass and restrained violet accents.
+- Softens Enhanced Screen to preserve skin tones and animation colours while adding mild contrast and clarity.
 
-Vidrock's catalogue JSON can be blocked by browser CORS rules. This package includes a free GitHub Action that mirrors the two catalogue files into your own repository, where the app can read them reliably.
-
-After uploading all files, open **GitHub → Actions → Sync Vidrock catalogues → Run workflow** once. The action then refreshes the files automatically every day.
-
-No paid API, API key, analytics service, or advertising library is used.
-
-## Picture modes
-
-- **Original** — provider image unchanged.
-- **Enhanced Screen** — mild contrast and saturation recovery plus a translucent optical layer.
-- **Glass Clear** — lighter, restrained clarity.
-- **Cinema** — slightly deeper blacks and softer colour.
-
-These modes improve presentation but cannot reconstruct detail absent from the source.
+Upload all files, including `.github/workflows/sync-catalogue.yml`, to the repository root.
