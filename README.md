@@ -1,20 +1,14 @@
-# Glass Cinema — Apple Glass Luminance Enhanced v7.4
+# Glass Cinema — Playback Restored v7.5
 
-This build keeps the exact visual palette and working embedded playback architecture of v7.0.
+This build restores the proven v7.3 embedded playback path while removing the unwanted previous/next episode controls.
 
-## Enhanced Screen v7.4
+## Changes
+- Restored the working contained-player implementation.
+- Removed previous/next episode buttons.
+- Kept the auto-hiding picture toolbar.
+- Kept the v7.0 colours.
+- Kept colour-neutral Enhanced Screen.
+- Full Screen again uses the reliable Glass Cinema player container; the provider’s own full-screen and Picture-in-Picture controls remain available inside the video.
+- Updated cache to v7.5.
 
-Enhanced Screen now preserves the source colours. It does not apply saturation, hue rotation, sepia, tinting or white-balance changes. It uses only restrained luminance-domain presentation adjustments:
-
-- subtle contrast recovery;
-- a very small brightness lift;
-- gentle highlight/shadow shaping;
-- a low-strength luminosity overlay for perceived clarity.
-
-This is browser-level optical enhancement, not AI upscaling. Because the video is inside a third-party iframe, Safari does not expose its decoded pixels for true sharpening or denoising.
-
-The catalogue sync workflow, local catalogue search, direct ID entry, embedded playback and fallback route are retained from v7.0.
-
-
-## v7.4 controls
-The floating picture toolbar now fades out automatically after 2.6 seconds and returns on pointer movement, hover, tap, or keyboard focus. Series playback includes Previous Episode and Next Episode controls that reload the embedded player with the adjacent episode while retaining the current season, title, and picture mode.
+Upload every file and folder to the repository, including `.github`.

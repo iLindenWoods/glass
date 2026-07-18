@@ -11,8 +11,8 @@ let currentRoute = '';
 let searchTimer = 0;
 let toolbarHideTimer = 0;
 
-function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV74')||'{}')}}catch{return{...defaults}}}
-function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV74',JSON.stringify(state))}
+function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV75')||'{}')}}catch{return{...defaults}}}
+function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV75',JSON.stringify(state))}
 function validHttps(value){try{const u=new URL(value);return u.protocol==='https:'?u:null}catch{return null}}
 function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3000)}
 function setStatus(kind,text){const el=$('#catalogueStatus');el.className='status '+kind;el.querySelector('span').textContent=text}
@@ -55,29 +55,14 @@ function showToolbar(persist=false){
     }
   },2600);
 }
-async function fullscreen(){
-  // Full-screen the provider frame itself, not the Glass Cinema wrapper.
-  // This gives Safari/iPadOS the provider's cleaner native-style player and
-  // keeps the Glass Cinema picture toolbar out of the full-screen surface.
-  const frame=$('#playerFrame');
-  try{
-    if(frame.requestFullscreen) await frame.requestFullscreen();
-    else if(frame.webkitRequestFullscreen) frame.webkitRequestFullscreen();
-    else toast('Use the player’s own full-screen button.');
-  }catch{
-    toast('Use the player’s own full-screen button.');
-  }
-}
+async function fullscreen(){const target=$('#embedPlayer');try{if(target.requestFullscreen)await target.requestFullscreen();else if(target.webkitRequestFullscreen)target.webkitRequestFullscreen();else toast('Tap the player’s own full-screen button.')}catch{toast('Tap the player’s own full-screen button.')}}
 function applyFilter(mode){const frame=$('#playerFrame'),overlay=$('#enhancementScreen'),player=$('#embedPlayer');frame.classList.remove('filter-enhanced','filter-clear','filter-cinema');overlay.classList.remove('active','cinema');player.dataset.pictureMode=mode;if(mode==='enhanced'){frame.classList.add('filter-enhanced');overlay.classList.add('active')}if(mode==='clear')frame.classList.add('filter-clear');if(mode==='cinema'){frame.classList.add('filter-cinema');overlay.classList.add('active','cinema')}$$('.mode').forEach(b=>b.classList.toggle('active',b.dataset.filter===mode));toast(mode==='enhanced'?'Luminance enhancement applied — colours unchanged':'Picture mode: '+mode)}
 
 $$('.segment').forEach(b=>b.onclick=()=>setType(b.dataset.type));
 $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>renderResults(e.target.value),80)});
 $('#idInput').addEventListener('input',()=>{selected=null;renderSelection()});
 $('#idInput').addEventListener('keydown',e=>{if(e.key==='Enter')play()});
-$('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#fullscreenBtn').onclick=fullscreen;
-$('#toolbarReveal').onclick=(event)=>{event.stopPropagation();showToolbar(true)};
-$('#playerToolbar').addEventListener('pointerleave',()=>showToolbar());
-$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
+$('#playButton').onclick=play;$('#closePlayer').onclick=closePlayer;$('#fullscreenBtn').onclick=fullscreen;$('#openDirect').onclick=()=>{if(currentRoute)window.location.assign(currentRoute)};
 $('.modes').onclick=e=>{const b=e.target.closest('[data-filter]');if(b)applyFilter(b.dataset.filter)};
 $('#clearSelection').onclick=()=>{selected=null;$('#idInput').value='';renderSelection()};
 $('#clearRecent').onclick=()=>{saveState({recent:[]});renderRecent()};

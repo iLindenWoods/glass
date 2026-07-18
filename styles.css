@@ -12,7 +12,7 @@ backdrop-filter:contrast(1.018) brightness(1.003);
 -webkit-backdrop-filter:contrast(1.018) brightness(1.003)}.enhancement-screen.active{opacity:1}.enhancement-screen.active:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.008) 0 1px,transparent 1px 3px);opacity:.10;mix-blend-mode:luminosity}.enhancement-screen.cinema{background:linear-gradient(180deg,rgba(255,224,195,.025),transparent 25%,transparent 70%,rgba(5,8,12,.10)),radial-gradient(ellipse at 50% 45%,transparent 40%,rgba(3,5,8,.13) 100%);backdrop-filter:contrast(1.025) saturate(.98);-webkit-backdrop-filter:contrast(1.025) saturate(.98)}.player-toolbar{position:absolute;z-index:5;left:50%;bottom:max(14px,env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;justify-content:center;align-items:center;gap:7px;padding:7px;border-radius:17px;opacity:.72;transition:opacity .2s;max-width:calc(100% - 20px);overflow:auto}.embed-player:hover .player-toolbar,.player-toolbar:focus-within{opacity:1}.glass-dark{background:rgba(16,19,25,.74);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}.player-toolbar button{border:0;background:transparent;color:#fff;border-radius:11px;padding:10px 12px;white-space:nowrap}.player-toolbar button:active,.mode.active{background:rgba(255,255,255,.18)}.modes{display:flex;gap:3px;padding:3px;background:rgba(0,0,0,.18);border-radius:13px}.toast{z-index:20}.results{max-height:235px}.recent-head{display:flex;align-items:center;gap:9px}.recent-list{grid-column:1/-1}.round{flex:0 0 auto}@media(max-width:720px){.status span{display:none}.player-toolbar{opacity:.85}.modes{display:flex}.player-toolbar button{padding:9px 10px;font-size:12px}}
 
 
-/* v7.4 — native frame full-screen and touch-safe toolbar reveal */
+/* v7.5 — restored playback with discreet auto-hiding toolbar */
 .player-toolbar{
   opacity:0;
   visibility:hidden;
@@ -46,33 +46,4 @@ backdrop-filter:contrast(1.018) brightness(1.003);
   .player-toolbar{opacity:0;visibility:hidden;pointer-events:none}
   .player-toolbar.visible,.player-toolbar:focus-within{opacity:1;visibility:visible;pointer-events:auto}
   .episode-navigation button{font-size:12px;padding:9px 10px}
-}
-
-
-/* v7.4 refinements */
-.episode-navigation{display:none!important}
-.toolbar-reveal{
-  position:absolute;
-  z-index:6;
-  left:50%;
-  bottom:max(12px,env(safe-area-inset-bottom));
-  transform:translateX(-50%);
-  width:48px;
-  height:26px;
-  padding:0;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:999px;
-  color:rgba(255,255,255,.82);
-  font-size:15px;
-  line-height:1;
-  letter-spacing:2px;
-  opacity:.42;
-  transition:opacity .2s ease,transform .2s ease;
-}
-.toolbar-reveal:hover,.toolbar-reveal:focus-visible{opacity:.95;transform:translateX(-50%) scale(1.04)}
-.embed-player.controls-visible .toolbar-reveal{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(8px)}
-.player-toolbar.visible + .toolbar-reveal{opacity:0}
-@media(hover:hover) and (pointer:fine){
-  .toolbar-reveal{opacity:.22}
-  .embed-player:hover .toolbar-reveal{opacity:.65}
 }
