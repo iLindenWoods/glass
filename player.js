@@ -10,8 +10,8 @@ let catalogues = { movie: [], tv: [] };
 let currentRoute = '';
 let searchTimer = 0;
 
-function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV7')||'{}')}}catch{return{...defaults}}}
-function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV7',JSON.stringify(state))}
+function readState(){try{return{...defaults,...JSON.parse(localStorage.getItem('glassCinemaV72')||'{}')}}catch{return{...defaults}}}
+function saveState(patch){state={...state,...patch};localStorage.setItem('glassCinemaV72',JSON.stringify(state))}
 function validHttps(value){try{const u=new URL(value);return u.protocol==='https:'?u:null}catch{return null}}
 function toast(message){const el=$('#toast');el.textContent=message;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,3000)}
 function setStatus(kind,text){const el=$('#catalogueStatus');el.className='status '+kind;el.querySelector('span').textContent=text}
@@ -41,7 +41,7 @@ function renderRecent(){const root=$('#recentList');root.replaceChildren();if(!s
 function play(){const id=normalizeId($('#idInput').value);if(!id){toast('Enter a valid TMDB number or IMDb tt-number.');$('#idInput').focus();return}const route=routeFor(id);if(!route){toast('Check the provider address in Settings.');return}currentRoute=route;const item=selected||{id,type:mediaType,title:`${mediaType==='tv'?'Series':'Movie'} ${id}`};addRecent(item);$('#emptyState').hidden=true;$('#embedPlayer').hidden=false;const frame=$('#playerFrame');frame.src='about:blank';requestAnimationFrame(()=>frame.src=route);toast('Loading inside Glass Cinema…')}
 function closePlayer(){const frame=$('#playerFrame');frame.src='about:blank';$('#embedPlayer').hidden=true;$('#emptyState').hidden=false;currentRoute=''}
 async function fullscreen(){const target=$('#embedPlayer');try{if(target.requestFullscreen)await target.requestFullscreen();else if(target.webkitRequestFullscreen)target.webkitRequestFullscreen();else toast('Tap the player’s own full-screen button.')}catch{toast('Tap the player’s own full-screen button.')}}
-function applyFilter(mode){const frame=$('#playerFrame'),overlay=$('#enhancementScreen'),player=$('#embedPlayer');frame.classList.remove('filter-enhanced','filter-clear','filter-cinema');overlay.classList.remove('active','cinema');player.dataset.pictureMode=mode;if(mode==='enhanced'){frame.classList.add('filter-enhanced');overlay.classList.add('active')}if(mode==='clear')frame.classList.add('filter-clear');if(mode==='cinema'){frame.classList.add('filter-cinema');overlay.classList.add('active','cinema')}$$('.mode').forEach(b=>b.classList.toggle('active',b.dataset.filter===mode));toast(mode==='enhanced'?'Enhanced Screen applied':'Picture mode: '+mode)}
+function applyFilter(mode){const frame=$('#playerFrame'),overlay=$('#enhancementScreen'),player=$('#embedPlayer');frame.classList.remove('filter-enhanced','filter-clear','filter-cinema');overlay.classList.remove('active','cinema');player.dataset.pictureMode=mode;if(mode==='enhanced'){frame.classList.add('filter-enhanced');overlay.classList.add('active')}if(mode==='clear')frame.classList.add('filter-clear');if(mode==='cinema'){frame.classList.add('filter-cinema');overlay.classList.add('active','cinema')}$$('.mode').forEach(b=>b.classList.toggle('active',b.dataset.filter===mode));toast(mode==='enhanced'?'Luminance enhancement applied — colours unchanged':'Picture mode: '+mode)}
 
 $$('.segment').forEach(b=>b.onclick=()=>setType(b.dataset.type));
 $('#titleSearch').addEventListener('input',e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>renderResults(e.target.value),80)});
