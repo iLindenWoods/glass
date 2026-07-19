@@ -1,19 +1,20 @@
-# Glass Cinema v10.1
+# Glass Cinema v10.2
 
-A complete flat 2D redesign based on the minimalist cinema-player concept.
+A flat, balanced, iPad-first Glass Cinema player with Apple system typography and a fixed-size library.
 
-## What changed
+## v10.2 changes
 
-- Rebuilt the interface with neutral graphite surfaces, a restrained coral accent, Apple system typography, and balanced spacing.
-- Removed the previous neumorphic and raised 3D styling.
-- Moved Glass Cinema controls to a compact top overlay so the embedded video provider's own bottom playback menu remains unobstructed.
-- Rebuilt the three-dot menu with reliable click/touch behaviour, outside-tap dismissal, Escape support, and a three-second inactivity close.
-- Added four persistent picture modes: Original, Enhanced, Glass Clear, and Cinema.
-- Added clear Full Screen and Open Directly actions inside the menu.
-- Improved search, selection, settings, recent-title playback, mobile/iPad responsiveness, and keyboard accessibility.
+- Added **154 built-in curated titles**: 94 movies and 60 series.
+- Added every title and TMDB number from the current watchlist, including Captain Future, Sherlock-related series, The Odyssey, the essential recommendations, all released principal Star Wars theatrical films, all thirteen Star Trek feature films, and the selected Shakespeare adaptations.
+- Search now checks **movies and series together**, regardless of the active Movie/Series tab, and automatically switches to the correct type when a result is selected.
+- Added alternate-title matching for entries such as Capitaine Flam, BBC Sherlock, Shogun, and common franchise abbreviations.
+- Rebuilt Continue Watching as a fixed-height, multi-column grid with a **vertical scrollbar**. New titles start a new row; the list can no longer widen the cinema or alter the player size.
+- Increased Continue Watching capacity from 12 to 40 titles.
+- The curated library is stored separately from the daily Vidrock synchronisation, so GitHub Actions cannot overwrite it.
+- Preserved the iPad-first 2D layout, Apple system font stack, embedded playback, picture modes, and working three-dot menu.
 
-The three-dot button opens the Glass Cinema menu. Interaction resets the three-second inactivity timer; choosing a picture mode closes the menu immediately.
+## Upload
 
+Upload the contents of this folder to the root of the GitHub Pages repository. Replace the previous files, including `index.html`, `styles.css`, `player.js`, `sw.js`, and the complete `catalogues` folder.
 
-## v10.1 iPad correction
-The cinema remains visible first in Safari, Home Screen mode, Split View and Stage Manager. Asset URLs and the service-worker cache are versioned to prevent stale layouts.
+The service-worker cache is versioned as v10.2 so installed iPad copies refresh to the new layout.

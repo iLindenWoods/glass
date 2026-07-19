@@ -1,3 +1,9 @@
-Upload every file and folder in this package to the root of the GitHub Pages repository, replacing the previous version. Keep `.github` and `catalogues`.
+# Upload Glass Cinema v10.2 to GitHub Pages
 
-After deployment, open the site once with `?v=10.0` so the browser refreshes the cached app files. The v10.0 service worker also removes older Glass Cinema caches automatically.
+1. Open the `glass-cinema` repository.
+2. Upload **the contents of this folder** to the repository root.
+3. Replace the existing files when GitHub asks.
+4. Keep the `catalogues` folder, including `curated-movie.json` and `curated-tv.json`.
+5. After deployment, open the site once with `?v=10.2` to bypass an old Safari page cache.
+
+Example: `https://ilindenwoods.github.io/glass-cinema/?v=10.2`

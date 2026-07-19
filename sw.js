@@ -1,10 +1,12 @@
-const CACHE = 'glass-cinema-v10-1';
+const CACHE = 'glass-cinema-v10-2';
 const CORE = [
   './',
   'index.html',
-  'styles.css?v=10.1',
-  'player.js?v=10.1',
+  'styles.css?v=10.2',
+  'player.js?v=10.2',
   'manifest.webmanifest',
+  'catalogues/curated-movie.json',
+  'catalogues/curated-tv.json',
   'icons/icon180.png',
   'icons/icon192.png',
   'icons/icon512.png'
@@ -28,7 +30,7 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
 
   if (url.pathname.includes('/catalogues/')) {
-    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request)));
+    event.respondWith(fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request, { ignoreSearch: true })));
     return;
   }
 

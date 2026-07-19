@@ -1,10 +1,10 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const DB_NAME = 'glassCinemaCatalogueV7';
+const DB_NAME = 'glassCinemaCatalogueV102';
 const STORE = 'catalogues';
-const STATE_KEY = 'glassCinemaV101';
-const LEGACY_STATE_KEYS = ['glassCinemaV100', 'glassCinemaV92'];
+const STATE_KEY = 'glassCinemaV102';
+const LEGACY_STATE_KEYS = ['glassCinemaV101', 'glassCinemaV100', 'glassCinemaV92'];
 const MENU_TIMEOUT = 3000;
 const defaults = {
   baseUrl: 'https://vidrock.ru',
@@ -78,11 +78,16 @@ function normalizeItem(raw, type) {
   const cleanId = normalizeId(id);
   if (!cleanId || !title) return null;
   const year = raw.year ?? String(raw.release_date ?? raw.first_air_date ?? '').slice(0, 4);
+  const rawAliases = raw.aliases ?? raw.alternative_titles ?? raw.alternativeTitles ?? raw.alt_titles ?? [];
+  const aliases = (Array.isArray(rawAliases) ? rawAliases : [rawAliases])
+    .map(value => String(value || '').trim())
+    .filter(Boolean);
   return {
     id: cleanId,
     type,
     title: String(title),
     year: String(year || ''),
+    aliases,
     imdb: raw.imdb_id ?? raw.imdbId ?? raw.imdb ?? '',
     tmdb: raw.tmdb_id ?? raw.tmdbId ?? raw.tmdb ?? (/^\d+$/.test(cleanId) ? cleanId : '')
   };
@@ -102,6 +107,38 @@ function extractItems(payload, type) {
     if (!items.length) items = Object.values(payload).filter(value => value && typeof value === 'object');
   }
   return items.map(item => normalizeItem(item, type)).filter(Boolean);
+}
+
+function mergeItems(...lists) {
+  const merged = new Map();
+  for (const list of lists) {
+    for (const item of list || []) {
+      const key = `${item.type}:${item.id}`;
+      const previous = merged.get(key);
+      if (!previous) {
+        merged.set(key, item);
+        continue;
+      }
+      merged.set(key, {
+        ...previous,
+        ...item,
+        aliases: [...new Set([...(previous.aliases || []), ...(item.aliases || [])])],
+        year: item.year || previous.year,
+        imdb: item.imdb || previous.imdb,
+        tmdb: item.tmdb || previous.tmdb
+      });
+    }
+  }
+  return [...merged.values()];
+}
+
+async function fetchCuratedCatalogue(type) {
+  const filename = type === 'movie' ? 'movie' : 'tv';
+  try {
+    return extractItems(await fetchJson(`catalogues/curated-${filename}.json`), type);
+  } catch {
+    return [];
+  }
 }
 
 function openDb() {
@@ -141,20 +178,28 @@ async function dbSet(key, value) {
   } catch { /* IndexedDB is an optional cache. */ }
 }
 
-async function fetchJson(url) {
-  const response = await fetch(url, {
-    cache: 'no-store',
-    credentials: 'omit',
-    referrerPolicy: 'no-referrer'
-  });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+async function fetchJson(url, timeoutMs = 6000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(url, {
+      cache: 'no-store',
+      credentials: 'omit',
+      referrerPolicy: 'no-referrer',
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.json();
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 async function fetchCatalogue(type) {
   const filename = type === 'movie' ? 'movie' : 'tv';
   try {
-    return extractItems(await fetchJson(`catalogues/${filename}.json?ts=${Date.now()}`), type);
+    const local = extractItems(await fetchJson(`catalogues/${filename}.json?ts=${Date.now()}`), type);
+    if (local.length) return local;
   } catch { /* Try the provider only when same-origin data is unavailable. */ }
 
   const base = validHttps(state.baseUrl);
@@ -164,27 +209,39 @@ async function fetchCatalogue(type) {
 
 async function loadCatalogues() {
   setStatus('', 'Loading catalogue…');
-  let loaded = 0;
 
+  let curatedLoaded = 0;
   for (const type of ['movie', 'tv']) {
-    try {
-      const list = await fetchCatalogue(type);
-      if (list.length) {
-        catalogues[type] = list;
-        await dbSet(type, { saved: Date.now(), list });
-        loaded += list.length;
-      }
-    } catch {
-      const cached = await dbGet(type);
-      if (cached?.list?.length) {
-        catalogues[type] = cached.list;
-        loaded += cached.list.length;
-      }
-    }
+    const curated = await fetchCuratedCatalogue(type);
+    catalogues[type] = curated;
+    curatedLoaded += curated.length;
   }
 
-  if (loaded) setStatus('ready', `${loaded.toLocaleString()} titles ready`);
-  else setStatus('error', 'Catalogue unavailable — IDs still work');
+  if (curatedLoaded) {
+    setStatus('ready', `${curatedLoaded.toLocaleString()} favourites ready`);
+    renderResults($('#titleSearch').value);
+  }
+
+  for (const type of ['movie', 'tv']) {
+    const curated = catalogues[type];
+    let synced = [];
+
+    try {
+      synced = await fetchCatalogue(type);
+      if (synced.length) await dbSet(type, { saved: Date.now(), list: synced });
+    } catch {
+      const cached = await dbGet(type);
+      if (cached?.list?.length) synced = cached.list;
+    }
+
+    catalogues[type] = mergeItems(synced, curated);
+  }
+
+  const loaded = catalogues.movie.length + catalogues.tv.length;
+  if (loaded) {
+    const builtIn = curatedLoaded ? ` · ${curatedLoaded.toLocaleString()} favourites built in` : '';
+    setStatus('ready', `${loaded.toLocaleString()} titles ready${builtIn}`);
+  } else setStatus('error', 'Catalogue unavailable — IDs still work');
   renderResults($('#titleSearch').value);
 }
 
@@ -230,17 +287,25 @@ function renderResults(query = '') {
   if (normalizedQuery.length < 2) return;
 
   const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-  const matches = catalogues[mediaType]
-    .filter(item => {
-      const searchable = `${item.title} ${item.year} ${item.id}`.toLocaleLowerCase();
-      return tokens.every(token => searchable.includes(token));
+  const matches = [...catalogues.movie, ...catalogues.tv]
+    .map(item => {
+      const title = item.title.toLocaleLowerCase();
+      const searchable = `${item.title} ${(item.aliases || []).join(' ')} ${item.year} ${item.id}`.toLocaleLowerCase();
+      if (!tokens.every(token => searchable.includes(token))) return null;
+      const score = item.id.toLocaleLowerCase() === normalizedQuery || title === normalizedQuery
+        ? 0
+        : title.startsWith(normalizedQuery) ? 1 : 2;
+      return { item, score };
     })
-    .slice(0, 32);
+    .filter(Boolean)
+    .sort((a, b) => a.score - b.score || a.item.title.localeCompare(b.item.title) || a.item.year.localeCompare(b.item.year))
+    .slice(0, 36)
+    .map(match => match.item);
 
   if (!matches.length) {
     const message = document.createElement('div');
     message.className = 'result message';
-    message.textContent = catalogues[mediaType].length ? 'No matching title found.' : 'Catalogue not synced yet; identifiers still work.';
+    message.textContent = catalogues.movie.length || catalogues.tv.length ? 'No matching title found.' : 'Catalogue not synced yet; identifiers still work.';
     root.append(message);
     return;
   }
@@ -252,7 +317,7 @@ function renderResults(query = '') {
     const title = document.createElement('span');
     title.textContent = item.title;
     const meta = document.createElement('small');
-    meta.textContent = [item.year, item.id].filter(Boolean).join(' · ');
+    meta.textContent = [item.type === 'tv' ? 'Series' : 'Movie', item.year, item.id].filter(Boolean).join(' · ');
     button.append(title, meta);
     button.addEventListener('click', () => choose(item));
     root.append(button);
@@ -277,7 +342,7 @@ function addRecent(item) {
     episode: mediaType === 'tv' ? Math.max(1, Number($('#episode').value) || 1) : null,
     playedAt: Date.now()
   };
-  const recent = [recentItem, ...state.recent.filter(entry => !(entry.id === item.id && entry.type === item.type))].slice(0, 12);
+  const recent = [recentItem, ...state.recent.filter(entry => !(entry.id === item.id && entry.type === item.type))].slice(0, 40);
   saveState({ recent });
   renderRecent();
 }
@@ -566,7 +631,7 @@ $('#playerFrame').addEventListener('load', () => {
   renderRecent();
   applyFilter(state.pictureMode || 'original', false);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js?v=10.1', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=10.2', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
   }
   await loadCatalogues();
 })();
