@@ -1,10 +1,10 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const DB_NAME = 'glassCinemaCatalogueV103';
+const DB_NAME = 'glassCinemaCatalogueV104';
 const STORE = 'catalogues';
-const STATE_KEY = 'glassCinemaV103';
-const LEGACY_STATE_KEYS = ['glassCinemaV102', 'glassCinemaV101', 'glassCinemaV100', 'glassCinemaV92'];
+const STATE_KEY = 'glassCinemaV104';
+const LEGACY_STATE_KEYS = ['glassCinemaV103', 'glassCinemaV102', 'glassCinemaV101', 'glassCinemaV100', 'glassCinemaV92'];
 const MENU_TIMEOUT = 3000;
 const defaults = {
   baseUrl: 'https://vidrock.ru',
@@ -135,7 +135,7 @@ function mergeItems(...lists) {
 async function fetchCuratedCatalogue(type) {
   const filename = type === 'movie' ? 'movie' : 'tv';
   try {
-    return extractItems(await fetchJson(`catalogues/curated-${filename}.json`), type);
+    return extractItems(await fetchJson(type === 'movie' ? 'library-m.json' : 'library-s.json'), type);
   } catch {
     return [];
   }
@@ -197,11 +197,6 @@ async function fetchJson(url, timeoutMs = 6000) {
 
 async function fetchCatalogue(type) {
   const filename = type === 'movie' ? 'movie' : 'tv';
-  try {
-    const local = extractItems(await fetchJson(`catalogues/${filename}.json?ts=${Date.now()}`), type);
-    if (local.length) return local;
-  } catch { /* Try the provider only when same-origin data is unavailable. */ }
-
   const base = validHttps(state.baseUrl);
   if (!base) throw new Error('Invalid provider URL');
   return extractItems(await fetchJson(`${base.href.replace(/\/$/, '')}/list/${filename}.json`), type);
@@ -259,14 +254,108 @@ function setType(type) {
   renderResults($('#titleSearch').value);
 }
 
-function choose(item) {
+function searchText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ');
+}
+
+function editDistance(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  const previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= a.length; i += 1) {
+    let diagonal = previous[0];
+    previous[0] = i;
+    for (let j = 1; j <= b.length; j += 1) {
+      const above = previous[j];
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      previous[j] = Math.min(previous[j] + 1, previous[j - 1] + 1, diagonal + cost);
+      diagonal = above;
+    }
+  }
+  return previous[b.length];
+}
+
+function tokenMatchCost(token, words) {
+  if (words.includes(token)) return 0;
+  if (/^\d+$/.test(token)) return Infinity;
+
+  for (const word of words) {
+    if (word.length < 3 || token.length < 3) continue;
+    if (word.startsWith(token)) return 1;
+  }
+
+  for (const word of words) {
+    if (Math.min(word.length, token.length) < 4) continue;
+    if (word.includes(token) || token.includes(word)) return 2;
+  }
+
+  let best = Infinity;
+  for (const word of words) {
+    if (word.length < 3) continue;
+    const longest = Math.max(token.length, word.length);
+    const lengthGap = Math.abs(token.length - word.length);
+    const maximumGap = longest >= 9 ? 2 : 1;
+    if (lengthGap > maximumGap) continue;
+    const allowance = longest >= 9 ? 3 : longest >= 5 ? 2 : 1;
+    const distance = editDistance(token, word);
+    if (distance <= allowance) best = Math.min(best, 3 + distance);
+  }
+  return best;
+}
+
+function scoreMatch(item, query) {
+  const normalizedQuery = searchText(query);
+  if (!normalizedQuery) return null;
+  const title = searchText(item.title);
+  const aliases = (item.aliases || []).map(searchText).filter(Boolean);
+  const identifier = searchText(`${item.id} ${item.tmdb || ''} ${item.imdb || ''}`);
+  const phrases = [title, ...aliases];
+
+  if (identifier.split(' ').includes(normalizedQuery)) return 0;
+  if (title === normalizedQuery) return 0;
+  if (aliases.includes(normalizedQuery)) return 1;
+  if (title.startsWith(normalizedQuery)) return 2;
+  if (phrases.some(phrase => phrase.includes(normalizedQuery))) return 3;
+
+  const queryTokens = normalizedQuery.split(' ').filter(Boolean);
+  const candidateWords = [...new Set(phrases.flatMap(phrase => phrase.split(' ')).filter(Boolean))];
+  let fuzzyCost = 0;
+  for (const token of queryTokens) {
+    const cost = tokenMatchCost(token, candidateWords);
+    if (!Number.isFinite(cost)) return null;
+    fuzzyCost += cost;
+  }
+  return 8 + fuzzyCost;
+}
+
+function findMatches(query) {
+  const normalizedQuery = searchText(query);
+  if (normalizedQuery.length < 2) return [];
+  return [...catalogues.movie, ...catalogues.tv]
+    .map(item => ({ item, score: scoreMatch(item, normalizedQuery) }))
+    .filter(match => Number.isFinite(match.score))
+    .sort((a, b) => a.score - b.score || a.item.title.localeCompare(b.item.title) || a.item.year.localeCompare(b.item.year))
+    .slice(0, 60)
+    .map(match => match.item);
+}
+
+function choose(item, keepResults = true) {
   if (item.type !== mediaType) setType(item.type);
   selected = item;
-  $('#idInput').value = state.preferTmdb && item.tmdb ? item.tmdb : item.id;
-  $('#titleSearch').value = item.title;
-  $('#results').replaceChildren();
+  const identifier = state.preferTmdb && item.tmdb ? item.tmdb : item.id;
+  $('#idInput').value = identifier;
   renderSelection();
-  toast(`${item.title} selected`);
+  if (keepResults) renderResults($('#titleSearch').value, false);
+  else $('#results').replaceChildren();
+  toast(`${/^tt/i.test(identifier) ? 'IMDb' : 'TMDB'} ${identifier} selected`);
 }
 
 function renderSelection() {
@@ -284,39 +373,33 @@ function renderSelection() {
   $('#quickPlayHeading').textContent = selected.title;
 }
 
-function renderResults(query = '') {
+function renderResults(query = '', explicit = false) {
   const root = $('#results');
   root.replaceChildren();
-  const normalizedQuery = query.trim().toLocaleLowerCase();
-  if (normalizedQuery.length < 2) return;
+  const normalizedQuery = searchText(query);
+  if (normalizedQuery.length < 2) return [];
 
-  const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
-  const matches = [...catalogues.movie, ...catalogues.tv]
-    .map(item => {
-      const title = item.title.toLocaleLowerCase();
-      const searchable = `${item.title} ${(item.aliases || []).join(' ')} ${item.year} ${item.id}`.toLocaleLowerCase();
-      if (!tokens.every(token => searchable.includes(token))) return null;
-      const score = item.id.toLocaleLowerCase() === normalizedQuery || title === normalizedQuery
-        ? 0
-        : title.startsWith(normalizedQuery) ? 1 : 2;
-      return { item, score };
-    })
-    .filter(Boolean)
-    .sort((a, b) => a.score - b.score || a.item.title.localeCompare(b.item.title) || a.item.year.localeCompare(b.item.year))
-    .slice(0, 36)
-    .map(match => match.item);
-
+  const matches = findMatches(normalizedQuery);
   if (!matches.length) {
     const message = document.createElement('div');
     message.className = 'result message';
-    message.textContent = catalogues.movie.length || catalogues.tv.length ? 'No matching title found.' : 'Catalogue not synced yet; identifiers still work.';
+    message.textContent = catalogues.movie.length || catalogues.tv.length
+      ? 'No exact result. Try fewer words or a different spelling.'
+      : 'Catalogue not loaded yet; identifiers still work.';
     root.append(message);
-    return;
+    return [];
   }
+
+  const summary = document.createElement('div');
+  summary.className = 'search-summary';
+  const totalText = matches.length === 60 ? '60+ matches' : `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
+  summary.innerHTML = `<strong>${totalText}</strong> · Select a title to place its TMDB or IMDb number below.`;
+  root.append(summary);
 
   for (const item of matches) {
     const button = document.createElement('button');
     button.className = 'result';
+    if (selected && selected.id === item.id && selected.type === item.type) button.classList.add('selected');
     button.type = 'button';
 
     const copy = document.createElement('span');
@@ -338,9 +421,22 @@ function renderResults(query = '') {
     idBadge.append(idLabel, idValue);
 
     button.append(copy, idBadge);
-    button.addEventListener('click', () => choose(item));
+    button.addEventListener('click', () => choose(item, true));
     root.append(button);
   }
+
+  if (explicit && matches.length === 1) choose(matches[0], true);
+  return matches;
+}
+
+function runSearch() {
+  const query = $('#titleSearch').value.trim();
+  if (searchText(query).length < 2) {
+    toast('Enter at least two letters.');
+    $('#titleSearch').focus();
+    return;
+  }
+  renderResults(query, true);
 }
 
 function routeFor(id) {
@@ -566,15 +662,21 @@ $$('.segment').forEach(button => button.addEventListener('click', () => setType(
 
 $('#titleSearch').addEventListener('input', event => {
   clearTimeout(searchTimer);
-  searchTimer = setTimeout(() => renderResults(event.target.value), 80);
+  searchTimer = setTimeout(() => renderResults(event.target.value, false), 100);
 });
 
 $('#titleSearch').addEventListener('keydown', event => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    runSearch();
+    return;
+  }
   if (event.key === 'Escape') {
     event.currentTarget.value = '';
     $('#results').replaceChildren();
   }
 });
+$('#searchButton').addEventListener('click', runSearch);
 
 $('#idInput').addEventListener('input', () => {
   selected = null;
@@ -650,7 +752,7 @@ $('#playerFrame').addEventListener('load', () => {
   renderRecent();
   applyFilter(state.pictureMode || 'original', false);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js?v=10.3', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=10.4', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
   }
   await loadCatalogues();
 })();

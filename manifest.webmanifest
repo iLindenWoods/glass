@@ -1,5 +1,5 @@
 {
-  "name": "Glass Cinema — Private screening room",
+  "name": "Glass Cinema",
   "short_name": "Glass Cinema",
   "start_url": "./",
   "scope": "./",
@@ -7,7 +7,15 @@
   "background_color": "#0b0b0d",
   "theme_color": "#0b0b0d",
   "icons": [
-    {"src": "icons/icon192.png", "sizes": "192x192", "type": "image/png"},
-    {"src": "icons/icon512.png", "sizes": "512x512", "type": "image/png"}
+    {
+      "src": "icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
