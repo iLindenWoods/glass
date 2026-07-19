@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Glass Cinema">
   <link rel="apple-touch-icon" href="icons/icon180.png">
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="styles.css?v=10.2">
+  <link rel="stylesheet" href="styles.css?v=10.3">
   <title>Glass Cinema</title>
 </head>
 <body>
@@ -50,9 +50,9 @@
           <button class="segment" type="button" data-type="tv" role="tab" aria-selected="false">Series</button>
         </div>
 
-        <label class="field-label" for="idInput">TMDB or IMDb identifier</label>
+        <label class="field-label" for="idInput">TMDB or IMDb number</label>
         <div class="id-row">
-          <input id="idInput" placeholder="e.g. 603 or tt0133093" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <input id="idInput" placeholder="TMDB 603 or IMDb tt0133093" autocomplete="off" autocapitalize="off" spellcheck="false">
           <button class="primary-play" id="playButton" type="button" aria-label="Play selected title">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 10 6-10 6z"/></svg>
           </button>
@@ -70,7 +70,10 @@
           <div class="selection-copy">
             <span>Selected</span>
             <strong id="selectedTitle"></strong>
-            <small id="selectedMeta"></small>
+            <div class="selection-details">
+              <small id="selectedMeta"></small>
+              <b class="selection-id" id="selectedId"></b>
+            </div>
           </div>
           <button class="icon-button quiet" id="clearSelection" type="button" aria-label="Clear selection">
             <svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>
@@ -80,7 +83,7 @@
 
       <footer class="library-footer">
         <div class="catalogue-status" id="catalogueStatus"><i></i><span>Loading catalogue…</span></div>
-        <span class="version">v10.2</span>
+        <span class="version">v10.3</span>
       </footer>
     </aside>
 
@@ -190,6 +193,6 @@
   </dialog>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="player.js?v=10.2"></script>
+  <script src="player.js?v=10.3"></script>
 </body>
 </html>

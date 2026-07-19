@@ -1,9 +1,9 @@
-const CACHE = 'glass-cinema-v10-2';
+const CACHE = 'glass-cinema-v10-3';
 const CORE = [
   './',
   'index.html',
-  'styles.css?v=10.2',
-  'player.js?v=10.2',
+  'styles.css?v=10.3',
+  'player.js?v=10.3',
   'manifest.webmanifest',
   'catalogues/curated-movie.json',
   'catalogues/curated-tv.json',

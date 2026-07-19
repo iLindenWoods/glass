@@ -1,10 +1,10 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const DB_NAME = 'glassCinemaCatalogueV102';
+const DB_NAME = 'glassCinemaCatalogueV103';
 const STORE = 'catalogues';
-const STATE_KEY = 'glassCinemaV102';
-const LEGACY_STATE_KEYS = ['glassCinemaV101', 'glassCinemaV100', 'glassCinemaV92'];
+const STATE_KEY = 'glassCinemaV103';
+const LEGACY_STATE_KEYS = ['glassCinemaV102', 'glassCinemaV101', 'glassCinemaV100', 'glassCinemaV92'];
 const MENU_TIMEOUT = 3000;
 const defaults = {
   baseUrl: 'https://vidrock.ru',
@@ -273,11 +273,15 @@ function renderSelection() {
   const card = $('#selectionCard');
   if (!selected) {
     card.hidden = true;
+    $('#quickPlayHeading').textContent = 'Choose a title';
     return;
   }
   card.hidden = false;
   $('#selectedTitle').textContent = selected.title;
-  $('#selectedMeta').textContent = [selected.year, selected.type === 'tv' ? 'Series' : 'Movie', selected.id].filter(Boolean).join(' · ');
+  $('#selectedMeta').textContent = [selected.type === 'tv' ? 'Series' : 'Movie', selected.year].filter(Boolean).join(' · ');
+  const selectedIdentifier = state.preferTmdb && selected.tmdb ? selected.tmdb : selected.id;
+  $('#selectedId').textContent = `${/^tt/i.test(selectedIdentifier) ? 'IMDb' : 'TMDB'} ${selectedIdentifier}`;
+  $('#quickPlayHeading').textContent = selected.title;
 }
 
 function renderResults(query = '') {
@@ -314,11 +318,26 @@ function renderResults(query = '') {
     const button = document.createElement('button');
     button.className = 'result';
     button.type = 'button';
-    const title = document.createElement('span');
+
+    const copy = document.createElement('span');
+    copy.className = 'result-copy';
+    const title = document.createElement('strong');
+    title.className = 'result-title';
     title.textContent = item.title;
     const meta = document.createElement('small');
-    meta.textContent = [item.type === 'tv' ? 'Series' : 'Movie', item.year, item.id].filter(Boolean).join(' · ');
-    button.append(title, meta);
+    meta.textContent = [item.type === 'tv' ? 'Series' : 'Movie', item.year].filter(Boolean).join(' · ');
+    copy.append(title, meta);
+
+    const identifier = state.preferTmdb && item.tmdb ? item.tmdb : item.id;
+    const idBadge = document.createElement('span');
+    idBadge.className = 'result-id';
+    const idLabel = document.createElement('small');
+    idLabel.textContent = /^tt/i.test(identifier) ? 'IMDb' : 'TMDB';
+    const idValue = document.createElement('b');
+    idValue.textContent = identifier;
+    idBadge.append(idLabel, idValue);
+
+    button.append(copy, idBadge);
     button.addEventListener('click', () => choose(item));
     root.append(button);
   }
@@ -383,8 +402,8 @@ function renderRecent() {
     title.textContent = item.title || `${item.type === 'tv' ? 'Series' : 'Movie'} ${item.id}`;
     const meta = document.createElement('small');
     meta.textContent = item.type === 'tv' && item.season
-      ? `Series · S${item.season} E${item.episode || 1}`
-      : 'Movie';
+      ? `Series · S${item.season} E${item.episode || 1} · TMDB ${item.id}`
+      : `Movie · TMDB ${item.id}`;
     copy.append(title, meta);
     button.append(icon, copy);
     button.addEventListener('click', () => useRecent(item, true));
@@ -631,7 +650,7 @@ $('#playerFrame').addEventListener('load', () => {
   renderRecent();
   applyFilter(state.pictureMode || 'original', false);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js?v=10.2', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
+    navigator.serviceWorker.register('sw.js?v=10.3', { updateViaCache: 'none' }).then(registration => registration.update()).catch(() => {});
   }
   await loadCatalogues();
 })();
